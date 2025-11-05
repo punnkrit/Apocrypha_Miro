@@ -1,0 +1,93 @@
+[
+  {
+    "id": "doc_001",
+    "filename": "Vendor_Contract_Acme.pdf",
+    "path": "/mnt/data/Vendor_Contract_Acme.pdf",
+    "title": "Vendor Agreement \u2014 Acme Corp",
+    "type": "Contract",
+    "department": "Legal",
+    "summary": "Agreement with Acme Corp for equipment supply, total value $340,000, effective Jan 15 2025.",
+    "snippet": "This contract outlines the purchase of 200 units with a total value of $340,000...",
+    "created": "2025-01-15",
+    "owner": "John Smith",
+    "confidence": 92
+  },
+  {
+    "id": "doc_002",
+    "filename": "Vendor_Invoice_Acme.xlsx",
+    "path": "/mnt/data/Vendor_Invoice_Acme.xlsx",
+    "title": "Vendor Invoice INV-2025-001",
+    "type": "Invoice",
+    "department": "Finance",
+    "summary": "Invoice for Acme Corp, amount $340,000, due Mar 27 2025.",
+    "snippet": "Invoice INV-2025-001 billed to Contoso LLC for equipment purchase.",
+    "created": "2025-02-10",
+    "owner": "Finance Team",
+    "confidence": 88
+  },
+  {
+    "id": "doc_003",
+    "filename": "Expense_Report_March.csv",
+    "path": "/mnt/data/Expense_Report_March.csv",
+    "title": "Expense Report \u2014 March 2025",
+    "type": "Finance Report",
+    "department": "Finance",
+    "summary": "Monthly expense report with corporate card transactions and notes.",
+    "snippet": "Notable increase in travel expense category compared to February...",
+    "created": "2025-03-31",
+    "owner": "Accounts Payable",
+    "confidence": 85
+  },
+  {
+    "id": "doc_004",
+    "filename": "Employee_Handbook_Contoso.txt",
+    "path": "/mnt/data/Employee_Handbook_Contoso.txt",
+    "title": "Employee Handbook \u2014 Contoso LLC",
+    "type": "HR Policy",
+    "department": "HR",
+    "summary": "Employee policies including PTO, conduct, and review cycles.",
+    "snippet": "Employees accrue PTO at a rate of 1.5 days per month.",
+    "created": "2025-01-01",
+    "owner": "People Ops",
+    "confidence": 90
+  },
+  {
+    "id": "doc_005",
+    "filename": "Product_PRD_Tiered_Pricing_Q1.pdf",
+    "path": "/mnt/data/Product_PRD_Tiered_Pricing_Q1.pdf",
+    "title": "Product PRD \u2014 Tiered Pricing",
+    "type": "PRD",
+    "department": "Product",
+    "summary": "Defines requirements for tiered pricing feature, acceptance criteria and billing implications.",
+    "snippet": "Add tiered pricing to the platform to support SMB, Growth, and Enterprise plans.",
+    "created": "2025-02-05",
+    "owner": "Priya Gupta",
+    "confidence": 91
+  },
+  {
+    "id": "doc_006",
+    "filename": "SlideDeck_Pitch.pdf",
+    "path": "/mnt/data/SlideDeck_Pitch.pdf",
+    "title": "Apocrypha Prototype Pitch Deck",
+    "type": "Presentation",
+    "department": "Executive",
+    "summary": "High-level slides describing prototype and next steps.",
+    "snippet": "Slide 3: Demo flows: Search, Preview, Summarize, Export",
+    "created": "2025-03-01",
+    "owner": "CEO",
+    "confidence": 87
+  },
+  {
+    "id": "doc_007",
+    "filename": "Company_Logo.png",
+    "path": "/mnt/data/Company_Logo.png",
+    "title": "Company Logo",
+    "type": "Asset",
+    "department": "Marketing",
+    "summary": "PNG logo asset for demos.",
+    "snippet": "APOCRYPHA",
+    "created": "2025-03-15",
+    "owner": "Marketing",
+    "confidence": 99
+  }
+]
