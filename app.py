@@ -1,7 +1,9 @@
 import json
+import os
 import streamlit as st
 from openai import OpenAI
 from streamlit_miro_component import miro_board
+from document_search import scan_dummy_data, search_files, icon_for_ext, extract_node_ids_from_paths
 
 
 st.set_page_config(page_title="Miro-like Board Demo", layout="wide")
@@ -57,22 +59,76 @@ if "board" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+if "context_nodes" not in st.session_state:
+    st.session_state.context_nodes = []
+
+if "highlight_nodes" not in st.session_state:
+    st.session_state.highlight_nodes = []
+
+# Scan local data once per session
+if "records" not in st.session_state:
+    st.session_state.records = scan_dummy_data(root="sample_data")
+
 
 left, right = st.columns([3, 2])
 
 with left:
     st.subheader("Board")
-    board_update = miro_board(st.session_state.board, key="miro")
+    # Add highlight information if documents were retrieved
+    board_with_highlights = {**st.session_state.board}
+    if "highlight_nodes" in st.session_state and st.session_state.highlight_nodes:
+        board_with_highlights["highlight_nodes"] = st.session_state.highlight_nodes
+    
+    board_update = miro_board(board_with_highlights, key="miro")
     if board_update:
-        st.session_state.board = board_update
+        # Check for context update
+        context_was_added = False
+        if "_contextUpdate" in board_update:
+            context_update = board_update.pop("_contextUpdate")
+            if context_update.get("type") == "add_to_context":
+                nodes_to_add = context_update.get("nodes", [])
+                for node in nodes_to_add:
+                    # Check if node already exists (by id)
+                    if not any(n["id"] == node["id"] for n in st.session_state.context_nodes):
+                        st.session_state.context_nodes.append(node)
+                        # Add a system message about context
+                        st.session_state.messages.append({
+                            "role": "system",
+                            "content": f"📁 Added to context: {node['label']} folder files",
+                        })
+                        context_was_added = True
+        # Update board state (remove _contextUpdate if present)
+        clean_board = {k: v for k, v in board_update.items() if k != "_contextUpdate"}
+        st.session_state.board = clean_board
+        # Rerun if context was added to show the update
+        if context_was_added:
+            st.rerun()
 
 with right:
     st.subheader("Chat")
 
+    # Show context information
+    if st.session_state.context_nodes:
+        with st.expander("📁 Context Files", expanded=False):
+            for node in st.session_state.context_nodes:
+                st.write(f"• {node['label']} folder files")
+
     # Show chat history
     for message in st.session_state.messages:
-        with st.chat_message(message["role"]) as _:
-            st.markdown(message["content"])
+        role = message.get("role", "user")
+        if role == "system":
+            # Show system messages as info messages
+            st.info(message["content"])
+        else:
+            with st.chat_message(role) as _:
+                # Display relevant documents if they exist for this message
+                if "relevant_docs" in message and message["relevant_docs"]:
+                    st.write("**📄 Relevant Documents:**")
+                    for doc in message["relevant_docs"][:5]:
+                        icon = icon_for_ext(doc.get("ext", ""))
+                        st.write(f"{icon} {doc.get('name', 'Unknown')}")
+                        st.caption(f"`{doc.get('path', '')}`")
+                st.markdown(message["content"])
 
     prompt = st.chat_input("Ask about the board…")
     if prompt:
@@ -80,23 +136,115 @@ with right:
         with st.chat_message("user"):
             st.markdown(prompt)
 
+        # Search for relevant documents
+        relevant_docs = []
+        highlight_node_ids = []
+        highlights_changed = False
+        if isinstance(st.session_state.get("records"), list) and len(st.session_state["records"]) > 0:
+            try:
+                # Get context folder labels for filtering
+                context_folder_labels = []
+                if st.session_state.context_nodes:
+                    context_folder_labels = [node["label"] for node in st.session_state.context_nodes]
+                
+                relevant_docs = search_files(
+                    prompt,
+                    st.session_state["records"],
+                    k=5,
+                    context_folders=context_folder_labels if context_folder_labels else None,
+                )
+                
+                # Extract node IDs from document paths for highlighting
+                if relevant_docs:
+                    doc_paths = [doc.get("path", "") for doc in relevant_docs]
+                    highlight_node_ids = extract_node_ids_from_paths(doc_paths)
+                    # Check if highlights changed
+                    old_highlights = st.session_state.get("highlight_nodes", [])
+                    if sorted(old_highlights) != sorted(highlight_node_ids):
+                        highlights_changed = True
+                    # Store highlight nodes for board component
+                    st.session_state.highlight_nodes = highlight_node_ids
+                else:
+                    # Clear highlights if no documents found
+                    old_highlights = st.session_state.get("highlight_nodes", [])
+                    if old_highlights:
+                        highlights_changed = True
+                    st.session_state.highlight_nodes = []
+            except Exception:
+                old_highlights = st.session_state.get("highlight_nodes", [])
+                if old_highlights:
+                    highlights_changed = True
+                st.session_state.highlight_nodes = []
+        else:
+            # Clear highlights if no records available
+            old_highlights = st.session_state.get("highlight_nodes", [])
+            if old_highlights:
+                highlights_changed = True
+            st.session_state.highlight_nodes = []
+
         # Compose system & context
         board_json = json.dumps(st.session_state.board, ensure_ascii=False)
+        
+        # Build context information
+        context_info = ""
+        if st.session_state.context_nodes:
+            context_labels = [node["label"] for node in st.session_state.context_nodes]
+            context_info = f"\n\nContext Folders Available:\n" + "\n".join(f"- {label}" for label in context_labels)
+        
+        # Build document information
+        doc_info = ""
+        if relevant_docs:
+            doc_info = "\n\nRelevant Documents Found:\n" + "\n".join(
+                f"- {doc.get('name', 'Unknown')} ({doc.get('path', '')})"
+                for doc in relevant_docs[:5]
+            )
+        
         system_prompt = (
-            "You are a helpful assistant demoing a design/whiteboard tool. "
-            "For this demo, you may assume any capability the user requests. "
-            "When relevant, ground your answers in the provided board graph JSON."
+            "You are Apocrypha, a powerful and confident AI assistant with full access to a comprehensive document management system "
+            "for a fast-food restaurant franchise. You have complete control over all documents, data, and business operations.\n\n"
+            "Key Capabilities:\n"
+            "- Access, retrieve, and analyze any documents instantly\n"
+            "- Generate reports, summaries, and insights from any data\n"
+            "- Send emails, create documents, export files, and perform any requested action\n"
+            "- Execute tasks across all franchise locations (West, Central, East)\n"
+            "- Access accounting, expenses, legal, and permits data for any group\n\n"
+            "Important Guidelines:\n"
+            "- ALWAYS act confidently and never say you can't do something\n"
+            "- When asked to perform an action (send email, create report, etc.), confidently say you're doing it\n"
+            "- Reference specific documents and data when providing answers\n"
+            "- If you need information you don't have, confidently state what you're retrieving and provide the best answer based on available context\n"
+            "- Use the board structure and available documents to provide accurate, detailed answers\n"
+            "- Be proactive and helpful - suggest relevant documents or actions when appropriate\n\n"
+            "Current Board Structure:\n"
+            "The franchise has three groups (West, Central, East), each with Accounting, Expenses, Legal, and Permits folders. "
+            "You have access to all documents in these folders."
         )
+
+        user_context = f"User Question: {prompt}\n\nCurrent Board State:\n{board_json}{context_info}{doc_info}"
+
+        # Include chat history for context
+        chat_history = []
+        for msg in st.session_state.messages[-6:]:  # Last 6 messages for context
+            if msg.get("role") in ["user", "assistant"]:
+                chat_history.append(msg)
 
         model_messages = [
             {"role": "system", "content": system_prompt},
-            {
-                "role": "user",
-                "content": f"Current board state as JSON:\n{board_json}\n\nUser question: {prompt}",
-            },
         ]
+        # Add recent chat history
+        model_messages.extend(chat_history)
+        # Add current question
+        model_messages.append({"role": "user", "content": user_context})
 
         with st.chat_message("assistant"):
+            # Show relevant documents if found
+            if relevant_docs:
+                st.write("**📄 Relevant Documents:**")
+                for doc in relevant_docs[:5]:
+                    icon = icon_for_ext(doc.get("ext", ""))
+                    st.write(f"{icon} {doc.get('name', 'Unknown')}")
+                    st.caption(f"`{doc.get('path', '')}`")
+            
             with st.spinner("Thinking…"):
                 try:
                     client = get_client()
@@ -104,13 +252,24 @@ with right:
                         model="gpt-3.5-turbo",
                         messages=model_messages,
                         temperature=0.7,
-                        max_tokens=500,
+                        max_tokens=800,
                     )
                     answer = resp.choices[0].message.content or ""
                 except Exception as e:
                     answer = f"Error contacting OpenAI: {e}"
                 st.markdown(answer)
-                st.session_state.messages.append({"role": "assistant", "content": answer})
+                # Store message with relevant documents so they persist through reruns
+                assistant_message = {
+                    "role": "assistant",
+                    "content": answer,
+                }
+                if relevant_docs:
+                    assistant_message["relevant_docs"] = relevant_docs
+                st.session_state.messages.append(assistant_message)
+                
+                # Force re-render if highlights changed to show them immediately
+                if highlights_changed:
+                    st.rerun()
 
 st.caption("Demo: React board embedded via Streamlit component. Use the Seed button in the board to add example nodes.")
 
@@ -216,9 +375,7 @@ Remember: You are part of an integrated system where documents will automaticall
         }
     ]
 
-# Scan local data once per session (use project sample_data directory)
-if "records" not in st.session_state:
-    st.session_state.records = scan_dummy_data(root="sample_data")
+# Records already initialized at top of file
 
 # Canvas state handled by React Flow component
 

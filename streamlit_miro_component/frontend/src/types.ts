@@ -18,5 +18,6 @@ export interface BoardState {
   nodes: BoardNode[];
   edges: BoardEdge[];
   selection: NodeId[];
+  highlight_nodes?: NodeId[];
 }
 

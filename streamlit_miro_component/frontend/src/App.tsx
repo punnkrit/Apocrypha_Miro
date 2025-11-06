@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Streamlit, RenderData } from 'streamlit-component-lib'
 import { Board } from './Board'
 import { BoardState } from './types'
@@ -9,20 +9,14 @@ export const App: React.FC = () => {
   const [renderData, setRenderData] = useState<RenderData | null>(null)
   const [board, setBoard] = useState<BoardState>(defaultBoard)
   const [connectMode, setConnectMode] = useState(false)
-  const seededRef = useRef(false)
+  const [dragMode, setDragMode] = useState(false)
 
   useEffect(() => {
     function onRender(event: CustomEvent<RenderData>) {
       setRenderData(event.detail)
       const incoming = (event.detail.args as any)?.board as BoardState | undefined
-      const hasIncoming = !!incoming && ((incoming.nodes && incoming.nodes.length > 0) || (incoming.edges && incoming.edges.length > 0))
-      if (hasIncoming) {
-        setBoard(incoming as BoardState)
-      } else if (!seededRef.current) {
-        const seed = qsrSeed()
-        seededRef.current = true
-        setBoard(seed)
-        Streamlit.setComponentValue(seed)
+      if (incoming) {
+        setBoard(incoming)
       }
       Streamlit.setFrameHeight()
     }
@@ -40,64 +34,22 @@ export const App: React.FC = () => {
     Streamlit.setComponentValue(next)
   }
 
-  const qsrSeed = (): BoardState => {
-    const nodes = [
-      { id: 'franchise', x: 500, y: 80, label: 'Franchise', icon: '🏪' },
-      { id: 'west', x: 250, y: 220, label: 'West_Group' },
-      { id: 'central', x: 500, y: 220, label: 'Central_Group' },
-      { id: 'east', x: 750, y: 220, label: 'East_Group' },
-      // West: A E L P
-      { id: 'west_A', x: 140, y: 330, label: 'Accounting' },
-      { id: 'west_E', x: 210, y: 420, label: 'Expenses' },
-      { id: 'west_L', x: 280, y: 330, label: 'Legal' },
-      { id: 'west_P', x: 350, y: 420, label: 'Permits' },
-      // Central: A E L P
-      { id: 'central_A', x: 400, y: 330, label: 'Accounting' },
-      { id: 'central_E', x: 470, y: 420, label: 'Expenses' },
-      { id: 'central_L', x: 540, y: 330, label: 'Legal' },
-      { id: 'central_P', x: 610, y: 420, label: 'Permits' },
-      // East: A E L P
-      { id: 'east_A', x: 660, y: 330, label: 'Accounting' },
-      { id: 'east_E', x: 730, y: 420, label: 'Expenses' },
-      { id: 'east_L', x: 800, y: 330, label: 'Legal' },
-      { id: 'east_P', x: 870, y: 420, label: 'Permits' },
-    ]
-    const edges = [
-      { id: 'e_f_w', from: 'franchise', to: 'west' },
-      { id: 'e_f_c', from: 'franchise', to: 'central' },
-      { id: 'e_f_e', from: 'franchise', to: 'east' },
-      // West children
-      { id: 'e_w_A', from: 'west', to: 'west_A' },
-      { id: 'e_w_E', from: 'west', to: 'west_E' },
-      { id: 'e_w_L', from: 'west', to: 'west_L' },
-      { id: 'e_w_P', from: 'west', to: 'west_P' },
-      // Central children
-      { id: 'e_c_A', from: 'central', to: 'central_A' },
-      { id: 'e_c_E', from: 'central', to: 'central_E' },
-      { id: 'e_c_L', from: 'central', to: 'central_L' },
-      { id: 'e_c_P', from: 'central', to: 'central_P' },
-      // East children
-      { id: 'e_e_A', from: 'east', to: 'east_A' },
-      { id: 'e_e_E', from: 'east', to: 'east_E' },
-      { id: 'e_e_L', from: 'east', to: 'east_L' },
-      { id: 'e_e_P', from: 'east', to: 'east_P' },
-    ]
-    return { nodes, edges, selection: [] }
-  }
-
-  const ensureSeed = () => {
-    if (board.nodes.length === 0) {
-      commitBoard(qsrSeed())
+  const handleAddToContext = () => {
+    if (board.selection.length === 0) return
+    const selectedNodes = board.nodes.filter((n) => board.selection.includes(n.id))
+    const contextUpdate = {
+      type: 'add_to_context',
+      nodes: selectedNodes.map((n) => ({ id: n.id, label: n.label })),
     }
+    Streamlit.setComponentValue({ ...board, _contextUpdate: contextUpdate })
   }
 
-  useEffect(ensureSeed, [])
+  const hasSelection = board.selection.length > 0
 
   return (
     <div style={{ height: 700, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: 8, borderBottom: '1px solid #eee', display: 'flex', gap: 8 }}>
+      <div style={{ padding: 8, borderBottom: '1px solid #eee', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <button onClick={() => commitBoard(defaultBoard)}>Reset</button>
-        <button onClick={() => commitBoard(qsrSeed())}>Seed</button>
         <button
           onClick={() => {
             const id = `n_${Date.now()}`
@@ -126,6 +78,26 @@ export const App: React.FC = () => {
           <input type="checkbox" checked={connectMode} onChange={(e) => setConnectMode(e.target.checked)} />
           Connect Mode
         </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <input type="checkbox" checked={dragMode} onChange={(e) => setDragMode(e.target.checked)} />
+          Drag Mode
+        </label>
+        {hasSelection && (
+          <button
+            onClick={handleAddToContext}
+            style={{
+              backgroundColor: '#4a90e2',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+            }}
+          >
+            Add to Context
+          </button>
+        )}
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>
         <Board
@@ -133,6 +105,7 @@ export const App: React.FC = () => {
           onChange={setBoard}
           onCommit={commitBoard}
           connectMode={connectMode}
+          dragMode={dragMode}
         />
       </div>
     </div>

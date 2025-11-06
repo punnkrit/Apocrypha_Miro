@@ -6,6 +6,7 @@ type Props = {
   onChange: (next: BoardState) => void
   onCommit?: (next: BoardState) => void
   connectMode?: boolean
+  dragMode?: boolean
 }
 
 type Point = { x: number; y: number }
@@ -14,7 +15,7 @@ function clampZoom(z: number) {
   return Math.min(2.5, Math.max(0.3, z))
 }
 
-export const Board: React.FC<Props> = ({ board, onChange, onCommit, connectMode = false }) => {
+export const Board: React.FC<Props> = ({ board, onChange, onCommit, connectMode = false, dragMode = false }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState<Point>({ x: 0, y: 0 })
@@ -60,15 +61,36 @@ export const Board: React.FC<Props> = ({ board, onChange, onCommit, connectMode 
     panStart.current = null
   }
 
+  const onClickNode = (e: React.MouseEvent, node: BoardNode) => {
+    e.stopPropagation()
+    if (connectMode) {
+      // Connect mode handles selection in onMouseDown
+      return
+    }
+    // Select node on click
+    let nextBoard: BoardState
+    if (e.shiftKey) {
+      const already = board.selection.includes(node.id)
+      const nextSel = already ? board.selection.filter((id) => id !== node.id) : [...board.selection, node.id]
+      nextBoard = { ...board, selection: nextSel }
+    } else {
+      nextBoard = { ...board, selection: [node.id] }
+    }
+    onChange(nextBoard)
+    // Commit selection change immediately so "Add to Context" button appears
+    if (onCommit) {
+      onCommit(nextBoard)
+    }
+  }
+
   const onMouseDownNode = (e: React.MouseEvent, node: BoardNode) => {
     e.stopPropagation()
-    const rect = (containerRef.current as HTMLDivElement).getBoundingClientRect()
-    const mouse: Point = { x: e.clientX - rect.left, y: e.clientY - rect.top }
-    const world = screenToWorld(mouse)
     if (connectMode) {
       if (!pendingSourceId) {
         setPendingSourceId(node.id)
-        onChange({ ...board, selection: [node.id] })
+        const nextBoard = { ...board, selection: [node.id] }
+        onChange(nextBoard)
+        if (onCommit) onCommit(nextBoard)
       } else if (pendingSourceId && pendingSourceId !== node.id) {
         const newEdgeId = `e_${pendingSourceId}_${node.id}_${Date.now()}`
         const next = { ...board, edges: [...board.edges, { id: newEdgeId, from: pendingSourceId, to: node.id }], selection: [node.id] }
@@ -76,27 +98,44 @@ export const Board: React.FC<Props> = ({ board, onChange, onCommit, connectMode 
         if (onCommit) onCommit(next)
         else onChange(next)
       }
-    } else {
+      return
+    }
+    
+    // Only start dragging if drag mode is enabled
+    if (dragMode) {
+      e.preventDefault() // Prevent text selection
+      const rect = (containerRef.current as HTMLDivElement).getBoundingClientRect()
+      const mouse: Point = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+      const world = screenToWorld(mouse)
       setDrag({ id: node.id, offset: { x: world.x - node.x, y: world.y - node.y } })
+    } else {
+      // If not in drag mode, select immediately on mouse down
+      let nextBoard: BoardState
       if (e.shiftKey) {
         const already = board.selection.includes(node.id)
         const nextSel = already ? board.selection.filter((id) => id !== node.id) : [...board.selection, node.id]
-        onChange({ ...board, selection: nextSel })
+        nextBoard = { ...board, selection: nextSel }
       } else {
-        onChange({ ...board, selection: [node.id] })
+        nextBoard = { ...board, selection: [node.id] }
+      }
+      onChange(nextBoard)
+      if (onCommit) {
+        onCommit(nextBoard)
       }
     }
   }
 
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!drag) return
-    const rect = (containerRef.current as HTMLDivElement).getBoundingClientRect()
-    const mouse: Point = { x: e.clientX - rect.left, y: e.clientY - rect.top }
-    const world = screenToWorld(mouse)
-    const nextNodes = board.nodes.map((n) =>
-      n.id === drag.id ? { ...n, x: world.x - drag.offset.x, y: world.y - drag.offset.y } : n
-    )
-    onChange({ ...board, nodes: nextNodes })
+    // Continue dragging if already started (only when drag mode is enabled)
+    if (drag && dragMode) {
+      const rect = (containerRef.current as HTMLDivElement).getBoundingClientRect()
+      const mouse: Point = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+      const world = screenToWorld(mouse)
+      const nextNodes = board.nodes.map((n) =>
+        n.id === drag.id ? { ...n, x: world.x - drag.offset.x, y: world.y - drag.offset.y } : n
+      )
+      onChange({ ...board, nodes: nextNodes })
+    }
   }
 
   const onMouseUp = () => {
@@ -120,9 +159,9 @@ export const Board: React.FC<Props> = ({ board, onChange, onCommit, connectMode 
       justifyContent: 'center',
       boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
       userSelect: 'none' as const,
-      cursor: drag ? 'grabbing' : 'grab',
+      cursor: drag ? 'grabbing' : dragMode ? 'grab' : 'pointer',
     }),
-    [drag]
+    [drag, dragMode]
   )
 
   const clearSelection = () => {
@@ -175,28 +214,66 @@ export const Board: React.FC<Props> = ({ board, onChange, onCommit, connectMode 
             if (!from || !to) return null
             const a = nodeCenter(from)
             const b = nodeCenter(to)
+            
+            // Check if edge should be highlighted (if either node is highlighted)
+            const highlightNodes = board.highlight_nodes || []
+            const isHighlighted = highlightNodes.includes(e.from) || highlightNodes.includes(e.to)
+            
             return (
-              <line key={e.id} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#9bb6e0" strokeWidth={2} markerEnd={"url(#arrow)"} />
+              <line
+                key={e.id}
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+                stroke={isHighlighted ? '#ff6b6b' : '#9bb6e0'}
+                strokeWidth={isHighlighted ? 3 : 2}
+                markerEnd={isHighlighted ? "url(#arrow-highlight)" : "url(#arrow)"}
+                opacity={isHighlighted ? 1 : 0.6}
+              />
             )
           })}
           <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#9bb6e0" />
             </marker>
+            <marker id="arrow-highlight" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff6b6b" />
+            </marker>
           </defs>
         </svg>
         {board.nodes.map((node) => {
           const selected = board.selection.includes(node.id)
+          const highlightNodes = board.highlight_nodes || []
+          const isHighlighted = highlightNodes.includes(node.id)
+          
+          // Determine border color and shadow
+          let borderColor = '#d0d0d0'
+          let boxShadow = nodeStyle.boxShadow
+          
+          if (isHighlighted && selected) {
+            borderColor = '#ff6b6b'
+            boxShadow = '0 0 0 3px rgba(255,107,107,0.4), 0 0 0 2px rgba(74,144,226,0.25)'
+          } else if (isHighlighted) {
+            borderColor = '#ff6b6b'
+            boxShadow = '0 0 0 3px rgba(255,107,107,0.4)'
+          } else if (selected) {
+            borderColor = '#4a90e2'
+            boxShadow = '0 0 0 2px rgba(74,144,226,0.25)'
+          }
+          
           return (
             <div
               key={node.id}
+              onClick={(e) => onClickNode(e, node)}
               onMouseDown={(e) => onMouseDownNode(e, node)}
               style={{
                 ...nodeStyle,
                 left: node.x,
                 top: node.y,
-                borderColor: selected ? '#4a90e2' : '#d0d0d0',
-                boxShadow: selected ? '0 0 0 2px rgba(74,144,226,0.25)' : nodeStyle.boxShadow,
+                borderColor,
+                boxShadow,
+                backgroundColor: isHighlighted ? '#fff5f5' : '#fff',
               }}
             >
               <div style={{ fontSize: 20, marginRight: 8 }}>{node.icon || '⬜️'}</div>
