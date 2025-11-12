@@ -17,24 +17,24 @@ if "board" not in st.session_state:
     st.session_state.board = {
         "nodes": [
             {"id": "franchise", "x": 500, "y": 80, "label": "Franchise", "icon": "🏪"},
-            {"id": "west", "x": 250, "y": 220, "label": "West_Group"},
-            {"id": "central", "x": 500, "y": 220, "label": "Central_Group"},
-            {"id": "east", "x": 750, "y": 220, "label": "East_Group"},
+            {"id": "west", "x": 250, "y": 220, "label": "West_Group", "icon": "🏬"},
+            {"id": "central", "x": 500, "y": 220, "label": "Central_Group", "icon": "🏢"},
+            {"id": "east", "x": 750, "y": 220, "label": "East_Group", "icon": "🏣"},
             # West folders
-            {"id": "west_A", "x": 140, "y": 330, "label": "Accounting"},
-            {"id": "west_E", "x": 210, "y": 420, "label": "Expenses"},
-            {"id": "west_L", "x": 280, "y": 330, "label": "Legal"},
-            {"id": "west_P", "x": 350, "y": 420, "label": "Permits"},
+            {"id": "west_A", "x": 140, "y": 330, "label": "Accounting", "icon": "💼"},
+            {"id": "west_E", "x": 210, "y": 420, "label": "Expenses", "icon": "💸"},
+            {"id": "west_L", "x": 280, "y": 330, "label": "Legal", "icon": "⚖️"},
+            {"id": "west_P", "x": 350, "y": 420, "label": "Permits", "icon": "🪪"},
             # Central folders
-            {"id": "central_A", "x": 400, "y": 330, "label": "Accounting"},
-            {"id": "central_E", "x": 470, "y": 420, "label": "Expenses"},
-            {"id": "central_L", "x": 540, "y": 330, "label": "Legal"},
-            {"id": "central_P", "x": 610, "y": 420, "label": "Permits"},
+            {"id": "central_A", "x": 400, "y": 330, "label": "Accounting", "icon": "💼"},
+            {"id": "central_E", "x": 470, "y": 420, "label": "Expenses", "icon": "💸"},
+            {"id": "central_L", "x": 540, "y": 330, "label": "Legal", "icon": "⚖️"},
+            {"id": "central_P", "x": 610, "y": 420, "label": "Permits", "icon": "🪪"},
             # East folders
-            {"id": "east_A", "x": 660, "y": 330, "label": "Accounting"},
-            {"id": "east_E", "x": 730, "y": 420, "label": "Expenses"},
-            {"id": "east_L", "x": 800, "y": 330, "label": "Legal"},
-            {"id": "east_P", "x": 870, "y": 420, "label": "Permits"},
+            {"id": "east_A", "x": 660, "y": 330, "label": "Accounting", "icon": "💼"},
+            {"id": "east_E", "x": 730, "y": 420, "label": "Expenses", "icon": "💸"},
+            {"id": "east_L", "x": 800, "y": 330, "label": "Legal", "icon": "⚖️"},
+            {"id": "east_P", "x": 870, "y": 420, "label": "Permits", "icon": "🪪"},
         ],
         "edges": [
             {"id": "e_f_w", "from": "franchise", "to": "west"},
@@ -124,7 +124,7 @@ with right:
                 # Display relevant documents if they exist for this message
                 if "relevant_docs" in message and message["relevant_docs"]:
                     st.write("**📄 Relevant Documents:**")
-                    for doc in message["relevant_docs"][:5]:
+                    for doc in message["relevant_docs"][:2]:
                         icon = icon_for_ext(doc.get("ext", ""))
                         st.write(f"{icon} {doc.get('name', 'Unknown')}")
                         st.caption(f"`{doc.get('path', '')}`")
@@ -150,7 +150,7 @@ with right:
                 relevant_docs = search_files(
                     prompt,
                     st.session_state["records"],
-                    k=5,
+                    k=2,
                     context_folders=context_folder_labels if context_folder_labels else None,
                 )
                 
@@ -196,7 +196,7 @@ with right:
         if relevant_docs:
             doc_info = "\n\nRelevant Documents Found:\n" + "\n".join(
                 f"- {doc.get('name', 'Unknown')} ({doc.get('path', '')})"
-                for doc in relevant_docs[:5]
+                for doc in relevant_docs[:2]
             )
         
         system_prompt = (
@@ -240,7 +240,7 @@ with right:
             # Show relevant documents if found
             if relevant_docs:
                 st.write("**📄 Relevant Documents:**")
-                for doc in relevant_docs[:5]:
+                for doc in relevant_docs[:2]:
                     icon = icon_for_ext(doc.get("ext", ""))
                     st.write(f"{icon} {doc.get('name', 'Unknown')}")
                     st.caption(f"`{doc.get('path', '')}`")
@@ -264,7 +264,7 @@ with right:
                     "content": answer,
                 }
                 if relevant_docs:
-                    assistant_message["relevant_docs"] = relevant_docs
+                    assistant_message["relevant_docs"] = relevant_docs[:2]
                 st.session_state.messages.append(assistant_message)
                 
                 # Force re-render if highlights changed to show them immediately
