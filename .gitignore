@@ -26,6 +26,8 @@ build/
 **/build/
 .vite/
 **/.vite/
+streamlit_miro_component/frontend/dist/
+streamlit_miro_component/frontend/.vite/
 
 # IDE
 .vscode/
@@ -37,3 +39,7 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Keep the build directory (needed for Streamlit Cloud)
+!streamlit_miro_component/build/
+!streamlit_miro_component/build/**
