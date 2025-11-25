@@ -43,3 +43,9 @@ Thumbs.db
 # Keep the build directory (needed for Streamlit Cloud)
 !streamlit_miro_component/build/
 !streamlit_miro_component/build/**
+!diagram-prototype/dist/
+!diagram-prototype/dist/**
+!diagram-prototype/dist/
+!diagram-prototype/dist/**
+!diagram-prototype/dist/
+!diagram-prototype/dist/**
