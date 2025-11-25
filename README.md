@@ -53,5 +53,14 @@ Users can sketch a franchise structure (Franchise → Region → Department), se
 - **Frontend Dev**: Run `npm run dev` in `diagram-prototype/` and set `MIRO_DEV_URL=http://localhost:5173` before running Streamlit to enable hot-reloading.
 - **Architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed technical documentation.
 
+## Deployment to Streamlit Cloud
+
+1. Build the frontend: `cd diagram-prototype && npm run build`
+2. Commit the `diagram-prototype/dist/` folder to git
+3. Push to your repository
+4. Deploy on [Streamlit Cloud](https://share.streamlit.io)
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
 ## License
 [Your License Here]

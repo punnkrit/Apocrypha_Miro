@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Exception: Allow dist folder for Streamlit Cloud deployment
+!dist/
+!dist/**
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

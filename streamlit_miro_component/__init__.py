@@ -16,8 +16,32 @@ if _dev_url:
     _miro_component = components.declare_component("miro_board", url=_dev_url)
 else:
     if not os.path.exists(_build_dir):
-        # Fallback or error if build missing
-        pass 
+        error_msg = f"""
+        ❌ **Component Build Missing**
+        
+        The `diagram-prototype/dist` directory was not found at: `{_build_dir}`
+        
+        **To fix this:**
+        1. Navigate to the `diagram-prototype` directory
+        2. Run: `npm install` (if not already done)
+        3. Run: `npm run build`
+        4. Ensure the `dist` folder is committed to git (check .gitignore)
+        5. For Streamlit Cloud: The `dist` folder must be in your repository
+        
+        **For local development:**
+        - Set `MIRO_DEV_URL=http://localhost:5173` environment variable
+        - Run `npm run dev` in the `diagram-prototype` directory
+        """
+        raise FileNotFoundError(error_msg)
+    
+    # Verify the dist folder has the required files
+    index_html = os.path.join(_build_dir, "index.html")
+    if not os.path.exists(index_html):
+        raise FileNotFoundError(
+            f"Build directory exists but is missing index.html at {index_html}. "
+            "Please run `npm run build` in the diagram-prototype directory."
+        )
+    
     _miro_component = components.declare_component("miro_board", path=_build_dir)
 
 
