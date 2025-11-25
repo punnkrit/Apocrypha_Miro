@@ -9,6 +9,7 @@
 - **Editable Nodes**: Custom `EditableNode.tsx` supports inline renaming, resizing, and rich visual feedback (highlights/selection).
 - **State Management**: Selection state stays local to React Flow; significant actions (like **Add to Context**) post events back to Streamlit via `Streamlit.setComponentValue`.
 - **Integration**: `_contextUpdate` events bridge the React frontend with the Python backend.
+- **Build Artifacts**: The frontend is built into `diagram-prototype/dist/`, which is served by the Streamlit component.
 
 ### Backend
 `app.py` is the Streamlit entrypoint. It seeds the logical tree, converts it to React Flow nodes/edges, renders the custom component, and handles context/chat events.
@@ -35,7 +36,7 @@
 
 ## Key Files & Directories
 - `app.py`: Streamlit application main file.
-- `streamlit_miro_component/`: Wrapper for the custom React component.
+- `streamlit_miro_component/`: Python wrapper that serves the built assets from `diagram-prototype/dist/`.
 - `diagram-prototype/`: Vite + React Flow project (source for the board component).
 - `sample_data/`: Synthetic documents for demo purposes.
 - `document_search.py`: Search logic and file system scanning.
