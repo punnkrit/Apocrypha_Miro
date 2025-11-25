@@ -79,14 +79,14 @@ def convert_to_react_flow_nodes_and_edges():
     
     # Helper to position nodes (simple static layout)
     # Root at top center - centered over the wider groups
-    root_pos = {'x': 800, 'y': 50}
+    root_pos = {'x': 720, 'y': 50}
     
     nodes.append({
         'id': 'restaurant_franchise',
         'type': 'editableNode',
         'position': root_pos,
         'data': {'label': 'Restaurant Franchise'},
-        'style': { 'background': '#fff', 'border': '2px solid #333', 'width': 180, 'height': 60, 'fontWeight': 'bold' }
+        'style': { 'background': '#fff', 'border': '2px solid #333', 'width': 300, 'height': 60, 'fontWeight': 'bold', 'fontSize': '24px' }
     })
 
     # Groups
@@ -102,7 +102,7 @@ def convert_to_react_flow_nodes_and_edges():
             'type': 'editableNode',
             'position': pos,
             'data': {'label': f'{group.capitalize()}_Group'},
-            'style': { 'background': '#f0f0f0', 'border': '1px solid #555', 'width': 150, 'height': 60 }
+            'style': { 'background': '#f0f0f0', 'border': '1px solid #555', 'width': 150, 'height': 60, 'fontSize': '20px' }
         })
         
         edges.append({
@@ -126,7 +126,7 @@ def convert_to_react_flow_nodes_and_edges():
             # Start = Center - (540/2) = Center - 270.
             # Start = (pos['x'] + 75) - 270 = pos['x'] - 195.
             
-            f_pos = {'x': pos['x'] - 195 + (f_idx * 140), 'y': 450}
+            f_pos = {'x': pos['x'] - 170 + (f_idx * 140), 'y': 450}
             
             icon = "📁"
             if folder == 'accounting': icon = "💼"
@@ -142,9 +142,9 @@ def convert_to_react_flow_nodes_and_edges():
                 'style': { 
                     'background': '#fff', 
                     'border': '1px solid #ccc', 
-                    'width': 120, 
+                    'width': 130, 
                     'height': 60,
-                    'fontSize': '12px',
+                    'fontSize': '18px',
                     'textAlign': 'center'
                 }
             })

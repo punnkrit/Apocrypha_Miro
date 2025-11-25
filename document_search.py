@@ -212,15 +212,15 @@ def extract_node_ids_from_paths(paths: List[str]) -> List[str]:
             # Check for category
             if not category:
                 if "accounting" in part_clean:
-                    category = "A"
+                    category = "accounting"
                 elif "expenses" in part_clean or "expense" in part_clean:
-                    category = "E"
+                    category = "expenses"
                 elif "legal" in part_clean:
-                    category = "L"
+                    category = "legal"
                 elif "permits" in part_clean or "permit" in part_clean:
-                    category = "P"
+                    category = "permits"
         
-        # Build node ID (e.g., "central_L" for Central_Group/Legal)
+        # Build node ID (e.g., "central_legal" for Central_Group/Legal)
         if group and category:
             node_id = f"{group}_{category}"
             if node_id not in node_ids:
