@@ -34,7 +34,8 @@ const getId = () => `node_${++id}_${Date.now()}`;
 const Flow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, screenToFlowPosition } = useReactFlow();
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [snapToGrid, setSnapToGrid] = useState(true);
   const [theme, setTheme] = useState<'dark' | 'light'>('light'); 
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null);
@@ -159,15 +160,19 @@ const Flow = () => {
 
   const addNode = useCallback(() => {
     takeSnapshot();
-    const existingNodes = getNodes();
-    const lastNode = existingNodes[existingNodes.length - 1];
     
     let position = { x: 300, y: 300 };
     
-    if (lastNode) {
-        position = { x: lastNode.position.x + 50, y: lastNode.position.y + 50 };
-    } else {
-         position = { x: 250, y: 250 };
+    if (reactFlowWrapper.current) {
+        const { top, left, width, height } = reactFlowWrapper.current.getBoundingClientRect();
+        const center = {
+            x: left + width / 2,
+            y: top + height / 2,
+        };
+        position = screenToFlowPosition(center);
+        // Center the node (width 120, height 60)
+        position.x -= 60;
+        position.y -= 30;
     }
 
     const newNode: Node = {
@@ -196,7 +201,7 @@ const Flow = () => {
     };
     
     setNodes((nds) => nds.concat(newNode));
-  }, [getNodes, setNodes, takeSnapshot]);
+  }, [setNodes, takeSnapshot, screenToFlowPosition]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -286,7 +291,7 @@ const Flow = () => {
 
   return (
     <div className="dndflow" style={{ display: 'flex', height: '800px', width: '100%' }}>
-      <div className="reactflow-wrapper" style={{ flexGrow: 1, height: '100%', width: '100%' }}>
+      <div className="reactflow-wrapper" ref={reactFlowWrapper} style={{ flexGrow: 1, height: '100%', width: '100%' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
