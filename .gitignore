@@ -45,7 +45,3 @@ Thumbs.db
 !streamlit_miro_component/build/**
 !diagram-prototype/dist/
 !diagram-prototype/dist/**
-!diagram-prototype/dist/
-!diagram-prototype/dist/**
-!diagram-prototype/dist/
-!diagram-prototype/dist/**
