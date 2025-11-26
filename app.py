@@ -71,17 +71,18 @@ if "pending_prompt" not in st.session_state:
 if "records" not in st.session_state:
     st.session_state.records = scan_dummy_data(root="sample_data")
 
-# --- Node Structure Definition ---
-if "process_map_nodes" not in st.session_state:
-    # Define the tree structure
+# --- Industry Selection ---
+if "selected_industry" not in st.session_state:
+    st.session_state.selected_industry = "fnb"  # Default to F&B
+
+# --- Node Structure Definition (Dynamic based on industry) ---
+def get_fnb_nodes():
+    """Generate Restaurant Franchise node structure."""
     nodes = {}
-    # Root
     nodes['restaurant_franchise'] = {'name': 'Restaurant Franchise', 'type': 'root'}
     
-    # Groups
     for group in ['west', 'central', 'east']:
         nodes[f'{group}_group'] = {'name': f'{group.capitalize()}_Group', 'parent': 'restaurant_franchise', 'type': 'group'}
-        # Folders
         for folder in ['accounting', 'expenses', 'legal', 'permits']:
             nodes[f'{group}_{folder}'] = {
                 'name': folder.capitalize(),
@@ -89,32 +90,70 @@ if "process_map_nodes" not in st.session_state:
                 'type': 'folder',
                 'label': folder[0].upper()
             }
-    st.session_state.process_map_nodes = nodes
+    return nodes
+
+def get_legal_nodes():
+    """Generate Legal Firm node structure."""
+    nodes = {}
+    nodes['legal_firm'] = {'name': 'Legal Firm', 'type': 'root'}
+    
+    # Practice areas with their matters
+    practice_areas = {
+        'corporate_law': ['techcorp_acquisition', 'globalretail_ipo'],
+        'litigation': ['smith_v_megacorp', 'contractdispute_abcvxyz'],
+        'real_estate': ['downtown_tower_development', 'office_lease_negotiation'],
+        'intellectual_property': ['patent_portfolio_biotech', 'trademark_dispute_fashion'],
+        'employment_law': ['executive_compensation_review', 'workplace_investigation'],
+    }
+    
+    for area, matters in practice_areas.items():
+        area_name = area.replace('_', ' ').title().replace(' ', '_')
+        nodes[area] = {'name': area_name, 'parent': 'legal_firm', 'type': 'practice_area'}
+        for matter in matters:
+            nodes[f'{area}_{matter}'] = {
+                'name': matter.replace('_', ' ').title(),
+                'parent': area,
+                'type': 'matter',
+            }
+    return nodes
+
+def update_process_map_nodes():
+    """Update the node structure based on selected industry."""
+    if st.session_state.selected_industry == "fnb":
+        st.session_state.process_map_nodes = get_fnb_nodes()
+    else:
+        st.session_state.process_map_nodes = get_legal_nodes()
+
+# Initialize nodes
+if "process_map_nodes" not in st.session_state:
+    update_process_map_nodes()
 
 # --- Helpers ---
 def convert_to_react_flow_nodes_and_edges():
-    """Generate React Flow nodes/edges from the logical structure."""
+    """Generate React Flow nodes/edges from the logical structure based on selected industry."""
+    if st.session_state.selected_industry == "fnb":
+        return convert_fnb_nodes_and_edges()
+    else:
+        return convert_legal_nodes_and_edges()
+
+def convert_fnb_nodes_and_edges():
+    """Generate React Flow nodes/edges for Restaurant Franchise."""
     nodes = []
     edges = []
     
-    # Helper to position nodes (simple static layout)
-    # Root at top center - centered over the wider groups
     root_pos = {'x': 725, 'y': 50}
     
     nodes.append({
         'id': 'restaurant_franchise',
         'type': 'editableNode',
         'position': root_pos,
-        'data': {'label': 'Restaurant Franchise'},
+        'data': {'label': '🍽️ Restaurant Franchise'},
         'style': { 'background': '#fff', 'border': '2px solid #333', 'width': 300, 'height': 60, 'fontWeight': 'bold', 'fontSize': '24px' }
     })
 
-    # Groups
     groups = ['west', 'central', 'east']
     for idx, group in enumerate(groups):
         group_id = f'{group}_group'
-        # Spread horizontally - increased spacing (600px) to prevent overlap of children
-        # Group 0 at 200, Group 1 at 800, Group 2 at 1400
         pos = {'x': 200 + (idx * 600), 'y': 250}
         
         nodes.append({
@@ -135,17 +174,9 @@ def convert_to_react_flow_nodes_and_edges():
             'style': { 'strokeWidth': 2 }
         })
 
-        # Folders under each group
         folders = ['accounting', 'expenses', 'legal', 'permits']
         for f_idx, folder in enumerate(folders):
             folder_id = f'{group}_{folder}'
-            # Spread folders below group
-            # Group width 150. Center is pos['x'] + 75.
-            # Folders width 120 + 20px gap = 140px stride.
-            # 4 folders: Total width 4*120 + 3*20 = 480 + 60 = 540.
-            # Start = Center - (540/2) = Center - 270.
-            # Start = (pos['x'] + 75) - 270 = pos['x'] - 195.
-            
             f_pos = {'x': pos['x'] - 170 + (f_idx * 140), 'y': 450}
             
             icon = "📁"
@@ -156,7 +187,7 @@ def convert_to_react_flow_nodes_and_edges():
 
             nodes.append({
                 'id': folder_id,
-                'type': 'editableNode', # Use editableNode for advanced features
+                'type': 'editableNode',
                 'position': f_pos,
                 'data': {'label': f'{icon} {folder.capitalize()}'},
                 'style': { 
@@ -181,24 +212,118 @@ def convert_to_react_flow_nodes_and_edges():
 
     return nodes, edges
 
+def convert_legal_nodes_and_edges():
+    """Generate React Flow nodes/edges for Legal Firm."""
+    nodes = []
+    edges = []
+    
+    root_pos = {'x': 725, 'y': 50}
+    
+    nodes.append({
+        'id': 'legal_firm',
+        'type': 'editableNode',
+        'position': root_pos,
+        'data': {'label': '⚖️ Legal Firm'},
+        'style': { 'background': '#fff', 'border': '2px solid #1a365d', 'width': 250, 'height': 60, 'fontWeight': 'bold', 'fontSize': '24px' }
+    })
+
+    # Practice areas with icons
+    practice_areas = [
+        ('corporate_law', '🏢 Corporate Law', ['TechCorp Acquisition', 'GlobalRetail IPO']),
+        ('litigation', '⚔️ Litigation', ['Smith v MegaCorp', 'Contract Dispute']),
+        ('real_estate', '🏗️ Real Estate', ['Tower Development', 'Office Lease']),
+        ('intellectual_property', '💡 IP', ['Patent Portfolio', 'Trademark Dispute']),
+        ('employment_law', '👥 Employment', ['Exec Compensation', 'Workplace Investigation']),
+    ]
+    
+    for idx, (area_id, area_label, matters) in enumerate(practice_areas):
+        # Position practice areas horizontally
+        area_pos = {'x': 100 + (idx * 320), 'y': 220}
+        
+        nodes.append({
+            'id': area_id,
+            'type': 'editableNode',
+            'position': area_pos,
+            'data': {'label': area_label},
+            'style': { 'background': '#e8f4f8', 'border': '1px solid #2c5282', 'width': 180, 'height': 55, 'fontSize': '16px' }
+        })
+        
+        edges.append({
+            'id': f'e-root-{area_id}',
+            'source': 'legal_firm',
+            'target': area_id,
+            'type': 'smoothstep',
+            'sourceHandle': 'bottom-source',
+            'targetHandle': 'top-target',
+            'style': { 'strokeWidth': 2, 'stroke': '#2c5282' }
+        })
+        
+        # Matters under each practice area
+        matter_ids = [
+            'techcorp_acquisition', 'globalretail_ipo',
+            'smith_v_megacorp', 'contractdispute_abcvxyz',
+            'downtown_tower_development', 'office_lease_negotiation',
+            'patent_portfolio_biotech', 'trademark_dispute_fashion',
+            'executive_compensation_review', 'workplace_investigation',
+        ]
+        
+        area_matters = matter_ids[idx*2:(idx*2)+2]
+        
+        for m_idx, (matter_id, matter_label) in enumerate(zip(area_matters, matters)):
+            full_matter_id = f'{area_id}_{matter_id}'
+            # Stack matters vertically under each practice area
+            m_pos = {'x': area_pos['x'] - 10, 'y': 350 + (m_idx * 90)}
+            
+            nodes.append({
+                'id': full_matter_id,
+                'type': 'editableNode',
+                'position': m_pos,
+                'data': {'label': f'📋 {matter_label}'},
+                'style': { 
+                    'background': '#fff', 
+                    'border': '1px solid #a0aec0', 
+                    'width': 200, 
+                    'height': 55,
+                    'fontSize': '14px',
+                    'textAlign': 'center'
+                }
+            })
+            
+            edges.append({
+                'id': f'e-{area_id}-{matter_id}',
+                'source': area_id,
+                'target': full_matter_id,
+                'type': 'smoothstep',
+                'sourceHandle': 'bottom-source',
+                'targetHandle': 'top-target',
+                'style': { 'stroke': '#a0aec0', 'strokeWidth': 2 }
+            })
+
+    return nodes, edges
+
 def map_node_to_files(node_id):
-    """Map a node ID to files in sample_data."""
+    """Map a node ID to files in sample_data based on current industry."""
     base = "sample_data"
+    
+    if st.session_state.selected_industry == "fnb":
+        return map_fnb_node_to_files(node_id, base)
+    else:
+        return map_legal_node_to_files(node_id, base)
+
+def map_fnb_node_to_files(node_id, base):
+    """Map F&B node ID to files."""
     if node_id == 'restaurant_franchise':
-        # Return all files? Or just listing of groups
-        return [] 
+        return []
         
     parts = node_id.split('_')
     if len(parts) < 2: return []
     
     group = parts[0].capitalize() + "_Group"
-    path = os.path.join(base, group)
+    path = os.path.join(base, "Restaurant_Franchise", group)
     
     if parts[1] == 'group':
-        # It's the group folder itself
         pass
     else:
-        # It's a subfolder
         sub = parts[1].capitalize()
         path = os.path.join(path, sub)
         
@@ -209,21 +334,127 @@ def map_node_to_files(node_id):
             return []
     return []
 
+def map_legal_node_to_files(node_id, base):
+    """Map Legal Firm node ID to files."""
+    if node_id == 'legal_firm':
+        return []
+    
+    # Practice area IDs: corporate_law, litigation, etc.
+    practice_areas = ['corporate_law', 'litigation', 'real_estate', 'intellectual_property', 'employment_law']
+    
+    # Check if it's a practice area (no matter suffix)
+    if node_id in practice_areas:
+        return []  # Practice areas don't have files directly
+    
+    # It's a matter - parse the ID
+    # Format: {practice_area}_{matter_id}
+    # e.g., corporate_law_techcorp_acquisition
+    
+    # Map node IDs to folder names
+    matter_folder_map = {
+        'corporate_law_techcorp_acquisition': 'Corporate_Law/TechCorp_Acquisition',
+        'corporate_law_globalretail_ipo': 'Corporate_Law/GlobalRetail_IPO',
+        'litigation_smith_v_megacorp': 'Litigation/Smith_v_MegaCorp',
+        'litigation_contractdispute_abcvxyz': 'Litigation/ContractDispute_ABCvXYZ',
+        'real_estate_downtown_tower_development': 'Real_Estate/Downtown_Tower_Development',
+        'real_estate_office_lease_negotiation': 'Real_Estate/Office_Lease_Negotiation',
+        'intellectual_property_patent_portfolio_biotech': 'Intellectual_Property/Patent_Portfolio_BioTech',
+        'intellectual_property_trademark_dispute_fashion': 'Intellectual_Property/Trademark_Dispute_Fashion',
+        'employment_law_executive_compensation_review': 'Employment_Law/Executive_Compensation_Review',
+        'employment_law_workplace_investigation': 'Employment_Law/Workplace_Investigation',
+    }
+    
+    if node_id in matter_folder_map:
+        path = os.path.join(base, "Legal_Firm", matter_folder_map[node_id])
+        if os.path.exists(path):
+            try:
+                return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+            except:
+                return []
+    
+    return []
+
+def get_expected_path_segment(node_id):
+    """Get the expected path segment for a node ID based on current industry."""
+    if st.session_state.selected_industry == "fnb":
+        # F&B: west_expenses -> Restaurant_Franchise/West_Group/Expenses
+        parts = node_id.split('_')
+        if len(parts) >= 2 and parts[1] != 'group':
+            group_name = parts[0].capitalize() + "_Group"
+            folder_name = parts[1].capitalize()
+            return f"Restaurant_Franchise{os.sep}{group_name}{os.sep}{folder_name}"
+        return None
+    else:
+        # Legal: Use the matter_folder_map
+        matter_folder_map = {
+            'corporate_law_techcorp_acquisition': 'Legal_Firm/Corporate_Law/TechCorp_Acquisition',
+            'corporate_law_globalretail_ipo': 'Legal_Firm/Corporate_Law/GlobalRetail_IPO',
+            'litigation_smith_v_megacorp': 'Legal_Firm/Litigation/Smith_v_MegaCorp',
+            'litigation_contractdispute_abcvxyz': 'Legal_Firm/Litigation/ContractDispute_ABCvXYZ',
+            'real_estate_downtown_tower_development': 'Legal_Firm/Real_Estate/Downtown_Tower_Development',
+            'real_estate_office_lease_negotiation': 'Legal_Firm/Real_Estate/Office_Lease_Negotiation',
+            'intellectual_property_patent_portfolio_biotech': 'Legal_Firm/Intellectual_Property/Patent_Portfolio_BioTech',
+            'intellectual_property_trademark_dispute_fashion': 'Legal_Firm/Intellectual_Property/Trademark_Dispute_Fashion',
+            'employment_law_executive_compensation_review': 'Legal_Firm/Employment_Law/Executive_Compensation_Review',
+            'employment_law_workplace_investigation': 'Legal_Firm/Employment_Law/Workplace_Investigation',
+        }
+        if node_id in matter_folder_map:
+            return matter_folder_map[node_id].replace("/", os.sep)
+        return None
+
 # --- UI Layout ---
 st.caption("Apocrypha Prototype: React Flow Integration (v2)")
+
+# Industry selector callbacks
+def select_fnb():
+    if st.session_state.selected_industry != "fnb":
+        st.session_state.selected_industry = "fnb"
+        update_process_map_nodes()
+        # Clear context when switching industries
+        st.session_state.context_nodes = []
+        st.session_state.highlight_nodes = []
+
+def select_legal():
+    if st.session_state.selected_industry != "legal":
+        st.session_state.selected_industry = "legal"
+        update_process_map_nodes()
+        # Clear context when switching industries
+        st.session_state.context_nodes = []
+        st.session_state.highlight_nodes = []
 
 col_board, col_chat = st.columns([3, 2])
 
 with col_board:
+    # Industry selector buttons
+    ind_col1, ind_col2, ind_col3 = st.columns([1, 1, 3])
+    with ind_col1:
+        fnb_selected = st.session_state.selected_industry == "fnb"
+        st.button(
+            "🍽️ F&B",
+            key="btn_fnb",
+            type="primary" if fnb_selected else "secondary",
+            on_click=select_fnb,
+            use_container_width=True
+        )
+    with ind_col2:
+        legal_selected = st.session_state.selected_industry == "legal"
+        st.button(
+            "⚖️ Legal",
+            key="btn_legal",
+            type="primary" if legal_selected else "secondary",
+            on_click=select_legal,
+            use_container_width=True
+        )
+    
     # Prepare data for React Flow
     rf_nodes, rf_edges = convert_to_react_flow_nodes_and_edges()
     
     # Pass highlights
     highlights = st.session_state.highlight_nodes
     
-    # Render Component
-    # Returns the component state (including events)
-    component_state = miro_board(nodes=rf_nodes, edges=rf_edges, highlight_nodes=highlights, key="main_board")
+    # Render Component with unique key per industry to force re-render
+    component_key = f"main_board_{st.session_state.selected_industry}"
+    component_state = miro_board(nodes=rf_nodes, edges=rf_edges, highlight_nodes=highlights, key=component_key)
     
     # Handle Component Events
     if component_state:
@@ -398,15 +629,9 @@ with col_chat:
             all_context_files = []
             for node in st.session_state.context_nodes:
                 node_id = node['id']
-                # Parse node_id to get the expected path components
-                # e.g., "west_expenses" -> West_Group/Expenses
-                parts = node_id.split('_')
-                if len(parts) >= 2:
-                    group_name = parts[0].capitalize() + "_Group"
-                    folder_name = parts[1].capitalize()
-                    expected_path_segment = f"{group_name}/{folder_name}".replace("/", os.sep)
-                else:
-                    expected_path_segment = None
+                
+                # Get expected path segment based on industry
+                expected_path_segment = get_expected_path_segment(node_id)
                 
                 if 'files' in node:
                     for f in node['files']:
