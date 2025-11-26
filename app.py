@@ -244,15 +244,21 @@ with col_board:
             elif st.session_state.ignore_context_updates:
                 st.session_state.ignore_context_updates = False  # Reset flag
                 st.session_state.recently_removed_ids.clear()  # Also clear removed IDs
-                # Mark this update as processed so we don't see it again
-                st.session_state.last_processed_context_update = update_signature
+                # Do NOT store the signature here - we want to allow re-adding the same nodes later
             elif update.get("type") == "add_to_context":
                 new_nodes = update.get("nodes", [])
+                
+                # Check if this is a NEW selection (different from last processed)
+                # If so, clear recently_removed_ids to allow re-adding previously removed nodes
+                is_new_selection = (update_signature != st.session_state.last_processed_context_update)
+                if is_new_selection:
+                    st.session_state.recently_removed_ids.clear()
+                
                 added_count = 0
                 for n in new_nodes:
                     node_id = n["id"]
                     
-                    # Skip if this node was recently removed by user
+                    # Skip if this node was recently removed by user (only applies to stale re-sends)
                     if node_id in st.session_state.recently_removed_ids:
                         continue
                     
@@ -274,25 +280,19 @@ with col_board:
                 st.session_state.last_processed_context_update = update_signature
                 
                 if added_count > 0:
-                    # Only clear recently_removed_ids when user intentionally adds NEW nodes
-                    # This means the user is actively adding, not the component re-sending old data
-                    st.session_state.recently_removed_ids.clear()
-                    
                     # Ensure context nodes are highlighted immediately
                     active_context_ids = [n['id'] for n in st.session_state.context_nodes]
                     st.session_state.highlight_nodes = list(set(st.session_state.highlight_nodes + active_context_ids))
                     st.rerun()
 
 with col_chat:
-    st.subheader("Chat")
-    
     # --- Callback functions for context management (defined outside container) ---
     def remove_node_callback(node_id):
         """Remove a specific node from context."""
-        # Add to recently removed set to prevent re-adding
-        st.session_state.recently_removed_ids.add(node_id)
-        
         st.session_state.context_nodes = [n for n in st.session_state.context_nodes if n['id'] != node_id]
+        
+        # Always clear the processed signature so user can re-add the same node
+        st.session_state.last_processed_context_update = None
         
         if st.session_state.context_nodes:
             st.session_state.highlight_nodes = [n['id'] for n in st.session_state.context_nodes]
@@ -300,8 +300,6 @@ with col_chat:
             st.session_state.highlight_nodes = []
             # Set flag to prevent component from re-adding nodes
             st.session_state.ignore_context_updates = True
-            # Clear the processed update signature so user can re-add the same nodes later
-            st.session_state.last_processed_context_update = None
     
     def clear_all_context_callback():
         """Clear all context nodes."""
@@ -312,46 +310,49 @@ with col_chat:
         # Clear the processed update signature so user can re-add the same nodes later
         st.session_state.last_processed_context_update = None
     
-    # Create a scrollable container for the chat area (context + messages)
-    with st.container(height=650):
-        # Context Display
+    # Header row with Chat title and Context dropdown
+    header_col1, header_col2 = st.columns([1, 1], vertical_alignment="bottom")
+    with header_col1:
+        st.subheader("Chat")
+    with header_col2:
+        # Context indicator and popover in the header
         if st.session_state.context_nodes:
-            with st.expander("📚 Active Context", expanded=True):
-                # Render each node with its own container to avoid button interference
+            context_count = len(st.session_state.context_nodes)
+            with st.popover(f"📚 Context ({context_count})", use_container_width=True):
+                st.markdown("**Active Context**")
+                st.markdown("---")
                 for idx, node in enumerate(st.session_state.context_nodes):
-                    # Use a container for each node to isolate button contexts
-                    node_container = st.container()
-                    with node_container:
-                        col1, col2 = st.columns([4, 1])
-                        with col1:
-                            st.markdown(f"**{node['label']}**")
-                            if node.get('files'):
-                                for f in node['files']:
-                                    st.caption(f"• {f}")
-                            else:
-                                st.caption("(No files found)")
-                        with col2:
-                            # Use on_click callback with unique key per node ID
-                            st.button(
-                                "❌",
-                                key=f"remove_node_{node['id']}",
-                                help=f"Remove {node['label']} from context",
-                                on_click=remove_node_callback,
-                                args=(node['id'],)
-                            )
-                    # Add a tiny divider between nodes (except after the last one)
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.markdown(f"**{node['label']}**")
+                        if node.get('files'):
+                            for f in node['files']:
+                                st.caption(f"• {f}")
+                        else:
+                            st.caption("(No files)")
+                    with col2:
+                        st.button(
+                            "❌",
+                            key=f"remove_node_{node['id']}",
+                            help=f"Remove {node['label']}",
+                            on_click=remove_node_callback,
+                            args=(node['id'],)
+                        )
                     if idx < len(st.session_state.context_nodes) - 1:
                         st.markdown("---")
                 
-                # Add spacing before the Clear All button
-                st.markdown("")  # Empty line for spacing
+                st.markdown("")
                 st.button(
-                    "🗑️ Clear All Context",
+                    "🗑️ Clear All",
                     key="clear_all_ctx_btn",
                     on_click=clear_all_context_callback,
                     use_container_width=True
                 )
-
+        else:
+            st.caption("📚 No context selected")
+    
+    # Create a scrollable container for the chat area
+    with st.container(height=620):
         # Chat Interface - Messages display
         for msg in st.session_state.messages:
             if msg["role"] == "system":
