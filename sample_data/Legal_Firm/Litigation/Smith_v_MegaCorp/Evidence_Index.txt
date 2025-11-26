@@ -1,0 +1,27 @@
+EVIDENCE INDEX
+
+Case: Smith v MegaCorp
+Client: John Smith (Plaintiff)
+
+CATEGORY A - EMPLOYMENT RECORDS
+A-001: Personnel File (150 pages)
+A-002: Performance Reviews 2019-2024 (45 pages)
+A-003: Compensation History (12 pages)
+A-004: Benefits Elections (8 pages)
+
+CATEGORY B - COMMUNICATIONS
+B-001: Emails re: promotion decisions (320 emails)
+B-002: Slack messages (archived)
+B-003: Meeting notes (25 documents)
+B-004: HR complaint correspondence (15 pages)
+
+CATEGORY C - POLICIES
+C-001: Employee Handbook 2024
+C-002: Anti-Discrimination Policy
+C-003: Complaint Procedures
+C-004: Management Training Materials
+
+CATEGORY D - WITNESS STATEMENTS
+D-001: Plaintiff declaration
+D-002: Coworker declarations (4)
+D-003: Manager statements (2)

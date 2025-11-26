@@ -1,0 +1,29 @@
+LEASE NEGOTIATION POINTS
+
+Matter: Office Lease Negotiation
+Client: TechStartup Inc
+
+RESOLVED ITEMS:
+✓ Base Rent: $50/SF (market rate)
+✓ Term: 10 years with 2 x 5-year options
+✓ TI Allowance: $70/SF
+✓ Free Rent: 6 months
+
+OPEN ITEMS:
+
+1. Renewal Rent
+   - Landlord: 95% of market
+   - Tenant: 90% of market (capped at 3% annual increase)
+   - STATUS: Discussing 92.5% with cap
+
+2. Assignment/Subletting
+   - Landlord: Consent required, profits shared 50/50
+   - Tenant: Consent not unreasonably withheld, no sharing
+   - STATUS: Agreed to 75/25 split
+
+3. Early Termination
+   - Landlord: No termination right
+   - Tenant: Right to terminate at Year 7
+   - STATUS: Discussing termination fee (6 months rent)
+
+NEXT STEPS: Final term sheet by March 15

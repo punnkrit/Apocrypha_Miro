@@ -1,0 +1,31 @@
+REGULATORY COMPLIANCE REVIEW
+
+Client: Fortune500 Corp
+Prepared by: Morrison & Blackwell LLP
+Date: March 2025
+
+EXECUTIVE COMPENSATION COMPLIANCE:
+
+1. SEC DISCLOSURE (Regulation S-K)
+   - CD&A: COMPLIANT
+   - Summary Compensation Table: COMPLIANT
+   - Pay Ratio Disclosure: COMPLIANT
+
+2. TAX COMPLIANCE
+   - Section 162(m): COMPLIANT (performance-based)
+   - Section 409A: COMPLIANT (proper deferrals)
+   - Section 280G: REVIEW RECOMMENDED
+
+3. EXCHANGE REQUIREMENTS
+   - Clawback Policy: COMPLIANT (adopted Oct 2023)
+   - Compensation Committee Charter: COMPLIANT
+   - Independence Requirements: COMPLIANT
+
+4. SAY ON PAY
+   - Last Vote: 92% approval (2024)
+   - Shareholder Engagement: Ongoing
+
+RECOMMENDATIONS:
+1. Update 280G analysis before any M&A
+2. Review equity grant timing procedures
+3. Consider ESG metrics in incentive plans

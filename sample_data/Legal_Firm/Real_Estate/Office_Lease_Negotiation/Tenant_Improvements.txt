@@ -1,0 +1,34 @@
+TENANT IMPROVEMENT SPECIFICATIONS
+
+Tenant: TechStartup Inc
+Premises: Suite 2500-2800 (Floors 25-28)
+Size: 24,000 RSF
+
+PROPOSED IMPROVEMENTS:
+
+1. DEMOLITION
+   - Remove existing partitions
+   - Remove flooring to slab
+   - Remove ceiling tiles
+
+2. CONSTRUCTION
+   - 45 private offices (glass front)
+   - 6 conference rooms
+   - Open collaboration areas
+   - Reception and waiting area
+   - Break room with kitchen
+   - Server room with HVAC
+
+3. FINISHES
+   - Flooring: Carpet tile (open), LVT (kitchen)
+   - Walls: Painted drywall, glass partitions
+   - Ceilings: 2x4 acoustic tile
+
+4. MEP
+   - Upgraded HVAC for server room
+   - Additional electrical capacity
+   - Data cabling throughout
+
+ESTIMATED COST: $1,680,000 ($70/SF)
+TI ALLOWANCE: $70/SF
+OUT OF POCKET: $0

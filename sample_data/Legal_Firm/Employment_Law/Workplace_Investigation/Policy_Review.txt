@@ -1,0 +1,36 @@
+POLICY REVIEW FINDINGS
+
+Client: Regional Healthcare
+Policy: Anti-Harassment and Discrimination
+
+REVIEW SUMMARY:
+
+STRENGTHS:
+✓ Comprehensive coverage of protected classes
+✓ Clear reporting procedures
+✓ Multiple reporting channels
+✓ Anti-retaliation provisions
+
+GAPS IDENTIFIED:
+
+1. Remote Work Considerations
+   - Policy drafted pre-COVID
+   - Needs virtual workplace provisions
+   - Recommendation: Update by Q2
+
+2. Social Media
+   - Limited guidance on online conduct
+   - Recommendation: Add social media section
+
+3. Third-Party Harassment
+   - Vendor/customer harassment not addressed
+   - Recommendation: Add third-party provisions
+
+4. Investigation Procedures
+   - Timeline not specified
+   - Recommendation: Add 30-day target
+
+TRAINING REQUIREMENTS:
+- Annual training: COMPLIANT
+- Manager training: NEEDS UPDATE
+- New hire training: COMPLIANT

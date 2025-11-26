@@ -1,0 +1,28 @@
+ZONING ANALYSIS
+
+Property: Downtown Tower Development Site
+Address: 100 Main Street, Metro City
+
+CURRENT ZONING: C-5 (Central Business District)
+
+PERMITTED USES:
+- Office buildings (primary)
+- Retail (ground floor)
+- Residential (above 5th floor)
+- Parking structures
+
+DEVELOPMENT STANDARDS:
+- Maximum Height: 45 stories / 550 feet
+- FAR: 15.0
+- Setbacks: None required
+- Parking: 1 space per 1,000 SF office
+
+PROPOSED PROJECT COMPLIANCE:
+- Height: 40 stories (COMPLIANT)
+- FAR: 12.5 (COMPLIANT)
+- Use: Mixed office/retail (COMPLIANT)
+- Parking: 850 spaces (COMPLIANT)
+
+VARIANCES REQUIRED: None
+
+RECOMMENDATION: Proceed with development application

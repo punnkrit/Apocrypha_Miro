@@ -1,0 +1,28 @@
+PATENT CLAIMS ANALYSIS
+
+Application: US 2025/0012345
+Client: BioTech Innovations
+
+INDEPENDENT CLAIMS SUMMARY:
+
+Claim 1 (Composition):
+"A pharmaceutical composition comprising Compound X in an amount 
+effective to treat autoimmune disorders..."
+- Strength: Strong - novel compound
+- Prior art concerns: Low
+
+Claim 15 (Method):
+"A method of treating autoimmune disorder comprising administering 
+to a patient in need thereof..."
+- Strength: Moderate - method claims narrower
+- Prior art concerns: Medium
+
+Claim 25 (Formulation):
+"A sustained-release formulation comprising..."
+- Strength: Strong - specific formulation
+- Prior art concerns: Low
+
+PROSECUTION STRATEGY:
+1. Maintain broad composition claims
+2. Add dependent claims for specific indications
+3. Consider divisional for method claims

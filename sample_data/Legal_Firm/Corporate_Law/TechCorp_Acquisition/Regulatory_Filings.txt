@@ -1,0 +1,24 @@
+REGULATORY FILING STATUS
+
+Matter: TechCorp Acquisition
+Client: TechCorp Industries
+
+REQUIRED FILINGS:
+
+1. Hart-Scott-Rodino (HSR) Act
+   - Filing Date: March 1, 2025
+   - Filing Fee: $280,000
+   - Waiting Period: 30 days
+   - Status: FILED
+
+2. State Antitrust Notifications
+   - California: Filed
+   - New York: Filed
+   - Texas: Not Required
+
+3. Industry-Specific Approvals
+   - FCC: Not Required
+   - FDA: Not Required
+   - CFIUS: Under Review
+
+EXPECTED CLEARANCE: April 15, 2025
