@@ -293,6 +293,8 @@ with col_chat:
             st.session_state.highlight_nodes = []
             # Set flag to prevent component from re-adding nodes
             st.session_state.ignore_context_updates = True
+            # Clear the processed update signature so user can re-add the same nodes later
+            st.session_state.last_processed_context_update = None
     
     def clear_all_context_callback():
         """Clear all context nodes."""
@@ -300,6 +302,8 @@ with col_chat:
         st.session_state.highlight_nodes = []
         # Set flag to prevent component from re-adding nodes
         st.session_state.ignore_context_updates = True
+        # Clear the processed update signature so user can re-add the same nodes later
+        st.session_state.last_processed_context_update = None
     
     # Create a scrollable container for the chat area (context + messages)
     with st.container(height=650):
