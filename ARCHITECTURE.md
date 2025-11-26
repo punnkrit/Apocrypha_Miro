@@ -30,8 +30,8 @@
 `sample_data/` mirrors the board structure. Each `*_Group` directory contains department folders with canonical documents (PDFs, CSVs, XLSX, etc.).
 
 `document_search.py` provides:
-- `scan_dummy_data`: Indexes the filesystem.
-- `search_files`: Performs heuristic keyword search.
+- `scan_dummy_data`: Indexes the filesystem (supports .txt, .md, .csv, and .pdf via pypdf).
+- `search_files`: Performs weighted keyword search with location/category boosting.
 - `extract_node_ids_from_paths`: Maps file hits back to visual node IDs for highlighting.
 
 ## Key Files & Directories

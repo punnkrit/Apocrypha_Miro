@@ -1,0 +1,7 @@
+Region: West_Group
+Annual Utilities Summary
+
+Electricity: $12,000
+Water: $4,000
+Internet: $6,000
+Total: $22,000

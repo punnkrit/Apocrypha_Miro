@@ -8,7 +8,7 @@ Users can sketch a franchise structure (Franchise → Region → Department), se
 - **Interactive Diagram**: React Flow powered board with draggable, resizable, and editable nodes.
 - **Context-Aware Chat**: Filter search results based on selected diagram nodes.
 - **Visual Feedback**: Real-time highlighting of nodes that contain relevant documents.
-- **Document Intelligence**: Scans and indexes local sample data to answer user queries.
+- **Document Intelligence**: Scans local sample data (PDF, TXT, CSV) to answer user queries with relevant excerpts.
 
 ## Typical User Flow
 1. **Launch**: Open the Streamlit app to see the split view (Board + Chat).

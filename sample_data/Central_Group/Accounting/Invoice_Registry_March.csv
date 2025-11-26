@@ -1,0 +1,3 @@
+Invoice_ID,Vendor,Amount,Due_Date
+Central_Group_INV-001,Office Depot,450.0,2025-03-15
+INV-002,AWS,1200.0,2025-03-20

@@ -79,7 +79,7 @@ def convert_to_react_flow_nodes_and_edges():
     
     # Helper to position nodes (simple static layout)
     # Root at top center - centered over the wider groups
-    root_pos = {'x': 720, 'y': 50}
+    root_pos = {'x': 725, 'y': 50}
     
     nodes.append({
         'id': 'restaurant_franchise',
@@ -258,8 +258,10 @@ with col_chat:
             with st.chat_message(msg["role"]):
                 if "relevant_docs" in msg:
                     st.write("**References:**")
-                    for doc in msg["relevant_docs"]:
-                        st.caption(f"📄 {doc.get('name')} ({doc.get('path')})")
+                    # Scrollable container for references
+                    with st.container(height=150):
+                        for doc in msg["relevant_docs"]:
+                            st.caption(f"📄 {doc.get('name')} ({doc.get('path')})")
                 st.write(msg["content"])
 
     if prompt := st.chat_input("Ask about the files..."):
@@ -272,14 +274,18 @@ with col_chat:
         relevant_docs = []
         if st.session_state.context_nodes:
             folder_names = [n['label'] for n in st.session_state.context_nodes]
-            relevant_docs = search_files(prompt, st.session_state.records, context_folders=folder_names)
+            relevant_docs = search_files(prompt, st.session_state.records, k=50, context_folders=folder_names)
         else:
             # Search all
-            relevant_docs = search_files(prompt, st.session_state.records)
+            relevant_docs = search_files(prompt, st.session_state.records, k=50)
 
         # Highlight logic
+        high_relevance_docs = []
         if relevant_docs:
-            new_highlights = extract_node_ids_from_paths([d['path'] for d in relevant_docs])
+            # Only highlight nodes for documents with score > 3.0
+            # This prevents low-relevance "noise" from lighting up the entire board
+            high_relevance_docs = [d for d in relevant_docs if d.get('score', 0) > 25.0]
+            new_highlights = extract_node_ids_from_paths([d['path'] for d in high_relevance_docs])
             st.session_state.highlight_nodes = new_highlights
         else:
             st.session_state.highlight_nodes = []
@@ -294,9 +300,9 @@ with col_chat:
                     history = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages if m["role"] != "system"]
                     
                     # System prompt with context
-                    sys_prompt = "You are a helpful assistant. Answer based on the user context and documents."
-                    if relevant_docs:
-                        doc_context = "\n".join([f"{d['name']}: {d.get('text', '')[:200]}..." for d in relevant_docs])
+                    sys_prompt = "You are a Apocrypha, a document intelligence agent. You have access to the company's file system. Answer based on the user context and documents."
+                    if high_relevance_docs:
+                        doc_context = "\n".join([f"File: {d['path']}\nContent:\n{d.get('text', '')}\n---" for d in high_relevance_docs])
                         sys_prompt += f"\n\nRelevant Document Excerpts:\n{doc_context}"
                     
                     response = client.chat.completions.create(
@@ -311,7 +317,7 @@ with col_chat:
                     st.session_state.messages.append({
                         "role": "assistant", 
                         "content": answer,
-                        "relevant_docs": relevant_docs
+                        "relevant_docs": high_relevance_docs
                     })
                     
                     # Rerun to update highlights on board immediately

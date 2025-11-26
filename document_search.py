@@ -2,7 +2,7 @@ import os
 from typing import List, Dict, Tuple
 
 import streamlit as st
-
+from pypdf import PdfReader
 
 Record = Dict[str, str]
 
@@ -34,6 +34,15 @@ def _read_best_effort(path: str, ext: str) -> str:
         if ext in {"txt", "md", "csv"}:
             with open(path, "r", encoding="utf-8", errors="ignore") as f:
                 return f.read()
+        elif ext == "pdf":
+            try:
+                reader = PdfReader(path)
+                text = ""
+                for page in reader.pages:
+                    text += page.extract_text() + "\n"
+                return text.strip()
+            except Exception:
+                return ""
         # Binary or complex formats: just return empty; we will search on filename
         return ""
     except Exception:
@@ -43,7 +52,7 @@ def _read_best_effort(path: str, ext: str) -> str:
 def search_files(
     query: str,
     records: List[Record],
-    k: int = 5,
+    k: int = 50,
     context_folders: List[str] = None,
 ) -> List[Record]:
     """Improved keyword search with context filtering and better scoring."""
@@ -119,10 +128,30 @@ def search_files(
                 score += 3.0
         
         # Path matching (boost if path matches query location/category)
+        # REQUIRE both location and category if both are present in query
+        path_score = 0.0
+        
         if query_location and query_location in path:
-            score += 8.0
+            path_score += 10.0
+        
         if query_category and query_category in path:
-            score += 8.0
+            path_score += 10.0
+            
+        # Bonus if BOTH matched and both were asked for
+        if query_location and query_category:
+            if (query_location in path) and (query_category in path):
+                path_score += 15.0  # Big boost for matching specific intersection
+            else:
+                # Penalize if we asked for a specific intersection but only found one part
+                # e.g. Asked for "Central Expenses", found "Central Permits" (only loc match)
+                path_score -= 5.0
+        elif query_category and not query_location:
+            # If ONLY category was asked (e.g. "Expenses"), boost matches significantly
+            # to ensure they cross the high threshold (25.0)
+            if query_category in path:
+                path_score += 15.0
+        
+        score += path_score
         
         # Category name matching in filename
         if query_category:
@@ -138,7 +167,10 @@ def search_files(
         
         # Only add if score is positive
         if score > 0:
-            scored.append((score, r))
+            # Add score to the record for downstream filtering
+            r_with_score = r.copy()
+            r_with_score["score"] = score
+            scored.append((score, r_with_score))
     
     scored.sort(key=lambda x: x[0], reverse=True)
     return [r for _, r in scored[:k]]

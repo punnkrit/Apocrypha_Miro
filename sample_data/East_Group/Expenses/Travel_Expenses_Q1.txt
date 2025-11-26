@@ -1,0 +1,6 @@
+Region: East_Group
+Travel Expense Report Q1
+
+March Conf: $1,200 (Flight+Hotel)
+Client Dinner: $350
+Uber: $45

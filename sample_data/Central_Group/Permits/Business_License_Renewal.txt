@@ -1,0 +1,5 @@
+Region: Central_Group
+City Business License
+License #: BL-2025-9988
+Expires: Dec 31, 2025
+Status: Active
