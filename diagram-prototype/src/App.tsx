@@ -17,7 +17,7 @@ import {
   BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Moon, Sun, ArrowRight, ArrowLeft, ArrowLeftRight, Minus } from 'lucide-react';
+import { Moon, Sun, ArrowRight, ArrowLeft, ArrowLeftRight, Minus, Type } from 'lucide-react';
 import { Streamlit, RenderData } from 'streamlit-component-lib';
 import EditableNode from './EditableNode';
 
@@ -186,15 +186,15 @@ const Flow = () => {
               border: '1px solid #777', 
               borderRadius: '5px',
               textAlign: 'center',
-              fontSize: '12px',
-              width: 120,
-              height: 60
+              fontSize: '16px',
+              width: 150,
+              height: 70
           } 
       },
       // Layout style for React Flow wrapper
       style: { 
-          width: 120, 
-          height: 60, 
+          width: 150, 
+          height: 70, 
           background: 'transparent', 
           border: 'none' 
       }
@@ -285,6 +285,32 @@ const Flow = () => {
       });
   };
 
+  const updateNodeFontSize = (delta: number) => {
+      if (selectedNodes.length === 0) return;
+      takeSnapshot();
+      
+      setNodes((nds) =>
+          nds.map((n) => {
+              if (selectedNodes.some(sn => sn.id === n.id)) {
+                  const currentStyle = (n.data.style as React.CSSProperties) || {};
+                  const currentSize = parseInt(String(currentStyle.fontSize || '16').replace('px', ''));
+                  const newSize = Math.max(10, Math.min(48, currentSize + delta)); // Clamp between 10-48px
+                  return {
+                      ...n,
+                      data: {
+                          ...n.data,
+                          style: {
+                              ...currentStyle,
+                              fontSize: `${newSize}px`
+                          }
+                      }
+                  };
+              }
+              return n;
+          })
+      );
+  };
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
@@ -328,20 +354,57 @@ const Flow = () => {
                 </label>
                 
                 {selectedNodes.length > 0 && (
-                    <button 
-                        onClick={handleAddToContext}
-                        style={{ 
-                            padding: '5px 10px', 
-                            cursor: 'pointer', 
-                            background: '#4A90E2', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: '4px',
-                            fontWeight: 'bold'
-                        }}
-                    >
-                        Add to Context
-                    </button>
+                    <>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', borderLeft: '1px solid #ccc', paddingLeft: '10px' }}>
+                            <Type size={16} />
+                            <button 
+                                onClick={() => updateNodeFontSize(-2)}
+                                style={{ 
+                                    padding: '2px 8px', 
+                                    cursor: 'pointer', 
+                                    background: 'var(--button-bg)', 
+                                    color: 'var(--button-text)', 
+                                    border: '1px solid #ccc', 
+                                    borderRadius: '4px',
+                                    fontWeight: 'bold',
+                                    fontSize: '14px'
+                                }}
+                                title="Decrease font size"
+                            >
+                                A-
+                            </button>
+                            <button 
+                                onClick={() => updateNodeFontSize(2)}
+                                style={{ 
+                                    padding: '2px 8px', 
+                                    cursor: 'pointer', 
+                                    background: 'var(--button-bg)', 
+                                    color: 'var(--button-text)', 
+                                    border: '1px solid #ccc', 
+                                    borderRadius: '4px',
+                                    fontWeight: 'bold',
+                                    fontSize: '14px'
+                                }}
+                                title="Increase font size"
+                            >
+                                A+
+                            </button>
+                        </div>
+                        <button 
+                            onClick={handleAddToContext}
+                            style={{ 
+                                padding: '5px 10px', 
+                                cursor: 'pointer', 
+                                background: '#4A90E2', 
+                                color: 'white', 
+                                border: 'none', 
+                                borderRadius: '4px',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            Add to Context
+                        </button>
+                    </>
                 )}
 
                 <button onClick={addNode} style={{ padding: '5px 10px', cursor: 'pointer', background: 'var(--button-bg)', color: 'var(--button-text)', border: 'none', borderRadius: '4px' }}>

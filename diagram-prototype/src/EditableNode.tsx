@@ -61,6 +61,9 @@ export default function EditableNode({ id, data, selected, width, height }: Node
   // Note: propStyle now mainly contains layout info (width/height) and transparent bg/border from App.tsx
   const visualStyle = (data.style as React.CSSProperties) || {};
   
+  // Get fontSize from visualStyle, default to 16px
+  const fontSize = visualStyle.fontSize || '16px';
+
   const style: React.CSSProperties = {
     ...visualStyle, // Include styles from parent (e.g. search highlight, border, color)
     padding: '10px',
@@ -84,6 +87,7 @@ export default function EditableNode({ id, data, selected, width, height }: Node
     minWidth: '100px',
     minHeight: '40px',
     boxSizing: 'border-box',
+    fontSize: fontSize,
   };
 
   // Task 2: Connection points visible only when selected (node clicked state)

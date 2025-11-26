@@ -59,6 +59,13 @@ if "recently_removed_ids" not in st.session_state:
 if "last_processed_context_update" not in st.session_state:
     st.session_state.last_processed_context_update = None
 
+# Track if we're currently processing a query (for showing spinner inside container)
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
+
+# Store pending prompt for processing after rerun
+if "pending_prompt" not in st.session_state:
+    st.session_state.pending_prompt = None
 
 # Scan local data once
 if "records" not in st.session_state:
@@ -359,14 +366,25 @@ with col_chat:
                             for doc in msg["relevant_docs"]:
                                 st.caption(f"📄 {doc.get('name')} ({doc.get('path')})")
                     st.write(msg["content"])
+        
+        # Show processing indicator inside the scrollable container
+        if st.session_state.is_processing:
+            with st.chat_message("assistant"):
+                st.write("🔄 Analyzing...")
 
     # Chat input stays outside the scrollable container (fixed at bottom)
     if prompt := st.chat_input("Ask about the files..."):
-        # User message
+        # Save user message and set processing flag, then rerun to show the message
         st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.write(prompt)
-            
+        st.session_state.is_processing = True
+        st.session_state.pending_prompt = prompt  # Store for processing after rerun
+        st.rerun()
+    
+    # Process pending prompt (after rerun, so user message is visible)
+    if st.session_state.is_processing and st.session_state.pending_prompt:
+        prompt = st.session_state.pending_prompt
+        st.session_state.pending_prompt = None  # Clear to avoid reprocessing
+        
         # RAG / Search Logic
         relevant_docs = []
         
@@ -441,38 +459,37 @@ with col_chat:
         else:
             st.session_state.highlight_nodes = []
 
-        # AI Response
-        with st.chat_message("assistant"):
-            with st.spinner("Analyzing..."):
-                try:
-                    client = get_client()
-                    
-                    # Build conversation history
-                    history = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages if m["role"] != "system"]
-                    
-                    # System prompt with context
-                    sys_prompt = "You are a Apocrypha, a document intelligence agent. You have access to the company's file system. Answer based on the user context and documents."
-                    if high_relevance_docs:
-                        doc_context = "\n".join([f"File: {d['path']}\nContent:\n{d.get('text', '')}\n---" for d in high_relevance_docs])
-                        sys_prompt += f"\n\nRelevant Document Excerpts:\n{doc_context}"
-                    
-                    response = client.chat.completions.create(
-                        model=st.session_state["openai_model"],
-                        messages=[{"role": "system", "content": sys_prompt}] + history[-5:],
-                        stream=False
-                    )
-                    answer = response.choices[0].message.content
-                    st.write(answer)
-                    
-                    # Save response
-                    st.session_state.messages.append({
-                        "role": "assistant", 
-                        "content": answer,
-                        "relevant_docs": high_relevance_docs
-                    })
-                    
-                    # Rerun to update highlights on board immediately
-                    st.rerun()
-                    
-                except Exception as e:
-                    st.error(f"Error: {e}")
+        # AI Response - process and save, then rerun to display inside container
+        try:
+            client = get_client()
+            
+            # Build conversation history
+            history = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages if m["role"] != "system"]
+            
+            # System prompt with context
+            sys_prompt = "You are a Apocrypha, a document intelligence agent. You have access to the company's file system. Answer based on the user context and documents."
+            if high_relevance_docs:
+                doc_context = "\n".join([f"File: {d['path']}\nContent:\n{d.get('text', '')}\n---" for d in high_relevance_docs])
+                sys_prompt += f"\n\nRelevant Document Excerpts:\n{doc_context}"
+            
+            response = client.chat.completions.create(
+                model=st.session_state["openai_model"],
+                messages=[{"role": "system", "content": sys_prompt}] + history[-5:],
+                stream=False
+            )
+            answer = response.choices[0].message.content
+            
+            # Save response to session state and clear processing flag
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": answer,
+                "relevant_docs": high_relevance_docs
+            })
+            st.session_state.is_processing = False
+            
+            # Rerun to display messages inside the scrollable container
+            st.rerun()
+            
+        except Exception as e:
+            st.session_state.is_processing = False
+            st.error(f"Error: {e}")
