@@ -1,5 +1,14 @@
 Region: East_Group
-Legal Memo
+Location: New York, NY
+Legal Department Memo
+Date: March 2025
 
-Re: Pending disputes.
-No active litigation as of March 2025. All prior claims settled.
+RE: Litigation Status Update
+
+Current Status:
+Two matters pending: (1) Lease dispute with building management - arbitration scheduled for April 2025. (2) Minor employment claim - expected settlement by March 2025.
+
+Counsel: Morrison & Associates LLP
+Contact: legal@eastgroup.com
+
+Next Review: April 15, 2025

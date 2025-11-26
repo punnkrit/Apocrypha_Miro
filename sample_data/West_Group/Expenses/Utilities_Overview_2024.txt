@@ -1,7 +1,12 @@
 Region: West_Group
-Annual Utilities Summary
+Location: Los Angeles, CA
+Annual Utilities Summary 2024
 
-Electricity: $12,000
-Water: $4,000
-Internet: $6,000
-Total: $22,000
+Monthly Averages:
+- Electricity: $14,500/year ($1,208/month)
+- Water: $3,200/year ($266/month)
+- Internet/Telecom: $4,800/year ($400/month)
+- Natural Gas: $2,100/year ($175/month)
+
+Total Annual Utilities: $24,600
+Compared to 2023: +2%

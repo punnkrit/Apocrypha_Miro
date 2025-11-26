@@ -1,6 +1,12 @@
 Region: Central_Group
-Travel Expense Report Q1
+Location: Chicago, IL
+Travel Expense Report Q1 2025
+Approved by: Michael Thompson
 
-March Conf: $1,200 (Flight+Hotel)
-Client Dinner: $350
-Uber: $45
+Travel Expenses:
+- Chicago Industry Conf: $2,200 (Flight+Hotel+Registration)
+- Client Meeting - Detroit: $680 (Flight + Meals)
+- Training Session - Milwaukee: $450 (Car rental + Hotel)
+
+Total Travel Expenses: $3,330
+Budget Remaining: $11,670

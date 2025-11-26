@@ -1,6 +1,13 @@
 Region: East_Group
+Location: New York, NY
 Financial Statement Q1 2025
+Prepared by: Jennifer Walsh
 
-Total Revenue: $1,200,000
-Net Profit: $150,000
-Verified by: Jane Doe
+Revenue Summary:
+- Total Revenue: $2,150,000
+- Operating Costs: $1,825,000
+- Net Profit: $275,000
+- Profit Margin: 12.8%
+
+Verified by: Jennifer Walsh
+Date: March 31, 2025

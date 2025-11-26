@@ -1,5 +1,24 @@
 Region: Central_Group
 NON-DISCLOSURE AGREEMENT
 
-This agreement is made between [Company] and [Partner]...
-Confidentiality terms: 5 years.
+This Non-Disclosure Agreement ("Agreement") is entered into as of [DATE]
+
+BETWEEN:
+Central_Group ("Disclosing Party")
+Address: Chicago, IL
+
+AND:
+Midwest Innovation Labs ("Receiving Party")
+
+TERMS:
+1. Confidentiality Period: 5 years from execution date
+2. Scope: All proprietary business information, trade secrets, and technical data
+3. Permitted Use: Evaluation of potential business relationship only
+4. Return of Materials: Within 30 days of written request
+
+Governing Law: State of IL
+
+SIGNATURES:
+_________________________    _________________________
+Michael Thompson            [Authorized Representative]
+Central_Group                 Midwest Innovation Labs

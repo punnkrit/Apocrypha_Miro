@@ -1,6 +1,13 @@
 Region: Central_Group
+Location: Chicago, IL
 Financial Statement Q1 2025
+Prepared by: Michael Thompson
 
-Total Revenue: $1,200,000
-Net Profit: $150,000
-Verified by: Jane Doe
+Revenue Summary:
+- Total Revenue: $1,680,000
+- Operating Costs: $1,420,000
+- Net Profit: $210,000
+- Profit Margin: 12.5%
+
+Verified by: Michael Thompson
+Date: March 31, 2025

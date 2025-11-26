@@ -1,5 +1,14 @@
 Region: West_Group
-Legal Memo
+Location: Los Angeles, CA
+Legal Department Memo
+Date: March 2025
 
-Re: Pending disputes.
-No active litigation as of March 2025. All prior claims settled.
+RE: Litigation Status Update
+
+Current Status:
+One pending dispute with former vendor (Pacific Supplies) regarding delivery terms. Expected resolution by Q2 2025.
+
+Counsel: Morrison & Associates LLP
+Contact: legal@westgroup.com
+
+Next Review: April 15, 2025

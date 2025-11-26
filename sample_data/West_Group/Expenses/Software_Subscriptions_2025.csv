@@ -1,4 +1,5 @@
-Service,Monthly_Cost,Owner
-West_Group_Slack,450,IT
-Zoom,200,Sales
-Jira,300,Eng
+Service,Monthly_Cost,Annual_Cost,Owner,Renewal_Date
+Salesforce CRM,680,8160,Sales,2025-09-01
+Slack Business,420,5040,IT,2025-04-01
+Adobe Creative,550,6600,Marketing,2025-09-01
+Zoom Pro,180,2160,Operations,2025-05-01

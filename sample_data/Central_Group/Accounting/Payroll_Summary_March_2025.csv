@@ -1,4 +1,6 @@
-Employee_ID,Name,Hours,Gross_Pay
-Central_Group_101,John Smith,160,5000
-102,Alice Brown,155,4800
-103,Bob Jones,160,5200
+Employee_ID,Name,Hours_Worked,Gross_Pay,Department
+C101,Amanda Foster,160,5500,Operations
+C102,Robert Williams,165,5800,Sales
+C103,Linda Martinez,158,5100,Engineering
+C104,James Anderson,160,5300,Marketing
+C105,Patricia Brown,162,5400,Support

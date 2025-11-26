@@ -1,4 +1,6 @@
-Service,Monthly_Cost,Owner
-East_Group_Slack,450,IT
-Zoom,200,Sales
-Jira,300,Eng
+Service,Monthly_Cost,Annual_Cost,Owner,Renewal_Date
+Salesforce Enterprise,1200,14400,Sales,2025-03-01
+Slack Business+,580,6960,IT,2025-11-01
+Atlassian Suite,720,8640,Engineering,2025-11-01
+Marketo,950,11400,Marketing,2025-07-01
+Zendesk,420,5040,Support,2025-07-01

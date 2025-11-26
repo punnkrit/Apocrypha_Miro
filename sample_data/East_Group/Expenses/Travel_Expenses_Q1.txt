@@ -1,6 +1,13 @@
 Region: East_Group
-Travel Expense Report Q1
+Location: New York, NY
+Travel Expense Report Q1 2025
+Approved by: Jennifer Walsh
 
-March Conf: $1,200 (Flight+Hotel)
-Client Dinner: $350
-Uber: $45
+Travel Expenses:
+- NYC FinTech Summit: $3,200 (Registration+Hotel+Meals)
+- Client Pitch - Boston: $1,100 (Train + Hotel + Dinner)
+- Industry Networking - DC: $1,850 (Flight + Hotel)
+- Team Building - Brooklyn: $2,800 (Venue + Activities)
+
+Total Travel Expenses: $8,950
+Budget Remaining: $6,050

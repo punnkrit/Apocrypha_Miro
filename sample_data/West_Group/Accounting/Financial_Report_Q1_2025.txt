@@ -1,6 +1,13 @@
 Region: West_Group
+Location: Los Angeles, CA
 Financial Statement Q1 2025
+Prepared by: Sarah Chen
 
-Total Revenue: $1,200,000
-Net Profit: $150,000
-Verified by: Jane Doe
+Revenue Summary:
+- Total Revenue: $1,450,000
+- Operating Costs: $1,215,000
+- Net Profit: $185,000
+- Profit Margin: 12.8%
+
+Verified by: Sarah Chen
+Date: March 31, 2025

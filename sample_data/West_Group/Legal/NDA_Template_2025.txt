@@ -1,5 +1,24 @@
 Region: West_Group
 NON-DISCLOSURE AGREEMENT
 
-This agreement is made between [Company] and [Partner]...
-Confidentiality terms: 5 years.
+This Non-Disclosure Agreement ("Agreement") is entered into as of [DATE]
+
+BETWEEN:
+West_Group ("Disclosing Party")
+Address: Los Angeles, CA
+
+AND:
+TechVenture Partners LLC ("Receiving Party")
+
+TERMS:
+1. Confidentiality Period: 3 years from execution date
+2. Scope: All proprietary business information, trade secrets, and technical data
+3. Permitted Use: Evaluation of potential business relationship only
+4. Return of Materials: Within 30 days of written request
+
+Governing Law: State of CA
+
+SIGNATURES:
+_________________________    _________________________
+Sarah Chen            [Authorized Representative]
+West_Group                 TechVenture Partners LLC

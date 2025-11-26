@@ -1,4 +1,5 @@
-Permit_Type,Fee,Frequency
-East_Group_Health,500,Annual
-Fire,250,Annual
-Signage,100,One-time
+Permit_Type,Fee,Frequency,Next_Due,Status
+Health Inspection,850,Annual,2025-06-01,Current
+Fire Safety,420,Annual,2025-04-15,Current
+Signage,280,One-time,N/A,Paid
+Parking,500,Annual,2025-08-01,Current

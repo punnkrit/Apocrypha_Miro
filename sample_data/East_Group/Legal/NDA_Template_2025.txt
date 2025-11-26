@@ -1,5 +1,24 @@
 Region: East_Group
 NON-DISCLOSURE AGREEMENT
 
-This agreement is made between [Company] and [Partner]...
-Confidentiality terms: 5 years.
+This Non-Disclosure Agreement ("Agreement") is entered into as of [DATE]
+
+BETWEEN:
+East_Group ("Disclosing Party")
+Address: New York, NY
+
+AND:
+Atlantic Ventures Capital ("Receiving Party")
+
+TERMS:
+1. Confidentiality Period: 7 years from execution date
+2. Scope: All proprietary business information, trade secrets, and technical data
+3. Permitted Use: Evaluation of potential business relationship only
+4. Return of Materials: Within 30 days of written request
+
+Governing Law: State of NY
+
+SIGNATURES:
+_________________________    _________________________
+Jennifer Walsh            [Authorized Representative]
+East_Group                 Atlantic Ventures Capital

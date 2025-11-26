@@ -1,3 +1,6 @@
-Vendor,Contract_Start,Contract_End,Status
-East_Group_Acme Corp,2024-01-01,2025-01-01,Active
-Global Supplies,2023-06-01,2025-06-01,Active
+Vendor,Contract_Start,Contract_End,Annual_Value,Status
+NYC Premier Supplies,2024-03-01,2026-03-01,$15,000,Active
+East Coast Tech,2024-05-15,2025-11-15,$31,000,Active
+Manhattan Maintenance,2024-01-01,2025-12-31,$46,000,Active
+Brooklyn Logistics,2024-07-01,2026-07-01,$12,000,Active
+Empire State Catering,2024-09-01,2025-09-01,$31,000,Active

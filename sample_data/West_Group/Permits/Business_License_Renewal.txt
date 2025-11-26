@@ -1,5 +1,18 @@
 Region: West_Group
-City Business License
-License #: BL-2025-9988
-Expires: Dec 31, 2025
-Status: Active
+Location: Los Angeles, CA
+
+CITY BUSINESS LICENSE
+
+License Number: BL-2025-LA-4421
+Business Name: West_Group Restaurant Operations
+Address: Los Angeles, CA
+
+Issue Date: January 1, 2025
+Expiration Date: December 31, 2025
+Status: ACTIVE
+
+License Type: Food Service Establishment
+Category: Full-Service Restaurant
+
+Renewal Fee Paid: $500
+Next Renewal: December 2025

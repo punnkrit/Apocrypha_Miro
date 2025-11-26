@@ -1,3 +1,5 @@
-Invoice_ID,Vendor,Amount,Due_Date
-Central_Group_INV-001,Office Depot,450.0,2025-03-15
-INV-002,AWS,1200.0,2025-03-20
+Invoice_ID,Vendor,Amount,Due_Date,Status
+C-INV-001,Midwest Office Supply,1120.0,2025-03-10,Pending
+C-INV-002,AWS Cloud Services,3200.0,2025-03-15,Pending
+C-INV-003,Chicago Maintenance,890.0,2025-03-22,Pending
+C-INV-004,Central Logistics Inc,2100.0,2025-03-28,Pending

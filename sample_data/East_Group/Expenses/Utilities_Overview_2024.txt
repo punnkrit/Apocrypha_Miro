@@ -1,7 +1,12 @@
 Region: East_Group
-Annual Utilities Summary
+Location: New York, NY
+Annual Utilities Summary 2024
 
-Electricity: $12,000
-Water: $4,000
-Internet: $6,000
-Total: $22,000
+Monthly Averages:
+- Electricity: $22,500/year ($1,875/month)
+- Water: $5,800/year ($483/month)
+- Internet/Telecom: $6,500/year ($541/month)
+- Natural Gas: $4,200/year ($350/month)
+
+Total Annual Utilities: $39,000
+Compared to 2023: -3%

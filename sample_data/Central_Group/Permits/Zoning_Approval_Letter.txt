@@ -1,5 +1,25 @@
 Region: Central_Group
-Zoning Department Approval
+ZONING DEPARTMENT APPROVAL LETTER
 
-Location is approved for commercial use (Category B).
-Date: Jan 15, 2025
+Date: January 15, 2025
+To: Central_Group Management
+Re: Zoning Compliance Verification
+
+Dear Michael Thompson,
+
+This letter confirms that the property located at Chicago, IL 
+is properly zoned for restaurant operations.
+
+Zoning Classification: Commercial Business District (B-3)
+Permitted Uses: Restaurant, Food Service, Retail (accessory)
+
+Special Conditions:
+- Operating hours: 6:00 AM - 12:00 AM
+- Outdoor seating: Approved (max 20 seats)
+- Alcohol service: Permitted with separate license
+
+This approval is valid through December 31, 2026.
+
+Sincerely,
+City Planning Department
+Chicago, IL

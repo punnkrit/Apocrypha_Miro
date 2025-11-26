@@ -1,7 +1,12 @@
 Region: Central_Group
-Annual Utilities Summary
+Location: Chicago, IL
+Annual Utilities Summary 2024
 
-Electricity: $12,000
-Water: $4,000
-Internet: $6,000
-Total: $22,000
+Monthly Averages:
+- Electricity: $18,200/year ($1,516/month)
+- Water: $4,100/year ($341/month)
+- Internet/Telecom: $5,200/year ($433/month)
+- Natural Gas: $3,800/year ($316/month)
+
+Total Annual Utilities: $31,300
+Compared to 2023: +6%

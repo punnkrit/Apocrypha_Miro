@@ -1,3 +1,4 @@
-Vendor,Contract_Start,Contract_End,Status
-West_Group_Acme Corp,2024-01-01,2025-01-01,Active
-Global Supplies,2023-06-01,2025-06-01,Active
+Vendor,Contract_Start,Contract_End,Annual_Value,Status
+Pacific Distributors,2024-02-01,2026-02-01,$50,000,Active
+West Tech Solutions,2024-06-15,2025-06-15,$15,000,Active
+Coastal Cleaning Co,2023-09-01,2025-09-01,$20,000,Active

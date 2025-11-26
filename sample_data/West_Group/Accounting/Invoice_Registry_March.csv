@@ -1,3 +1,4 @@
-Invoice_ID,Vendor,Amount,Due_Date
-West_Group_INV-001,Office Depot,450.0,2025-03-15
-INV-002,AWS,1200.0,2025-03-20
+Invoice_ID,Vendor,Amount,Due_Date,Status
+W-INV-001,Pacific Supplies Co,875.5,2025-03-12,Pending
+W-INV-002,CloudTech Services,2400.0,2025-03-18,Pending
+W-INV-003,West Coast Logistics,1650.0,2025-03-25,Pending

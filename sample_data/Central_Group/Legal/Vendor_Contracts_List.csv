@@ -1,3 +1,5 @@
-Vendor,Contract_Start,Contract_End,Status
-Central_Group_Acme Corp,2024-01-01,2025-01-01,Active
-Global Supplies,2023-06-01,2025-06-01,Active
+Vendor,Contract_Start,Contract_End,Annual_Value,Status
+Midwest Supplies Inc,2024-01-15,2026-01-15,$26,000,Active
+Central IT Solutions,2024-04-01,2025-10-01,$33,000,Active
+Chicago Janitorial,2024-03-01,2025-03-01,$28,000,Renewal Pending
+Great Lakes Shipping,2023-11-01,2025-11-01,$46,000,Active

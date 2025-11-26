@@ -1,3 +1,6 @@
-Invoice_ID,Vendor,Amount,Due_Date
-East_Group_INV-001,Office Depot,450.0,2025-03-15
-INV-002,AWS,1200.0,2025-03-20
+Invoice_ID,Vendor,Amount,Due_Date,Status
+E-INV-001,Manhattan Office Co,1850.0,2025-03-08,Pending
+E-INV-002,Azure Cloud Platform,4500.0,2025-03-14,Pending
+E-INV-003,NYC Facilities Mgmt,2200.0,2025-03-20,Pending
+E-INV-004,East Coast Express,1450.0,2025-03-26,Pending
+E-INV-005,Brooklyn Tech Services,980.0,2025-03-30,Pending
