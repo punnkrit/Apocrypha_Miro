@@ -1,0 +1,6 @@
+Product,Position,Delta_M,Gamma_M,Vega_M,DV01_K
+SPY Options,Long,1.2,-0.3,0.8,0
+QQQ Options,Short,-0.8,0.2,-0.5,0
+IWM Options,Long,0.5,-0.1,0.3,0
+Treasury Futures,Long,0,0,0,45
+VIX Futures,Short,0,0,-0.2,0

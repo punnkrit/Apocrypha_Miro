@@ -1,0 +1,6 @@
+Issuer,Coupon,Maturity,Rating,Weight,Spread,Duration
+Apple Inc,4.50%,2030,AA+,3.2%,45,4.8
+JPMorgan Chase,5.00%,2028,A+,2.8%,85,3.2
+Microsoft Corp,4.20%,2032,AAA,2.5%,35,6.1
+Bank of America,4.75%,2029,A,2.3%,95,4.0
+Verizon,4.80%,2031,BBB+,2.1%,120,5.2

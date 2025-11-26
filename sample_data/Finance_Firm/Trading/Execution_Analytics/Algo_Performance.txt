@@ -1,0 +1,32 @@
+ALGORITHM PERFORMANCE ANALYSIS
+
+March 2025
+
+VWAP ALGORITHM:
+- Orders: 850
+- Avg Slippage: +0.8 bps (beat VWAP)
+- Participation Rate: 12%
+- Best for: Large orders, liquid names
+
+TWAP ALGORITHM:
+- Orders: 420
+- Avg Slippage: +0.5 bps
+- Completion Rate: 99%
+- Best for: Scheduled rebalancing
+
+IMPLEMENTATION SHORTFALL:
+- Orders: 380
+- Avg Cost: 6.2 bps
+- Market Impact: 4.5 bps
+- Best for: Urgent, alpha-driven
+
+DARK POOL AGGREGATOR:
+- Orders: 520
+- Fill Rate: 35%
+- Price Improvement: 2.1 bps
+- Best for: Block trades
+
+RECOMMENDATIONS:
+1. Increase dark pool usage for blocks
+2. Use IS algo for momentum trades
+3. VWAP for index rebalancing

@@ -117,12 +117,39 @@ def get_legal_nodes():
             }
     return nodes
 
+def get_finance_nodes():
+    """Generate Finance Firm node structure."""
+    nodes = {}
+    nodes['finance_firm'] = {'name': 'Finance Firm', 'type': 'root'}
+    
+    # Departments with their sub-areas
+    departments = {
+        'equity_research': ['tech_sector_analysis', 'healthcare_sector_analysis'],
+        'fixed_income': ['investment_grade', 'high_yield'],
+        'portfolio_management': ['growth_fund', 'value_fund'],
+        'risk_management': ['market_risk', 'credit_risk'],
+        'trading': ['execution_analytics', 'market_making'],
+    }
+    
+    for dept, areas in departments.items():
+        dept_name = dept.replace('_', ' ').title().replace(' ', '_')
+        nodes[dept] = {'name': dept_name, 'parent': 'finance_firm', 'type': 'department'}
+        for area in areas:
+            nodes[f'{dept}_{area}'] = {
+                'name': area.replace('_', ' ').title(),
+                'parent': dept,
+                'type': 'area',
+            }
+    return nodes
+
 def update_process_map_nodes():
     """Update the node structure based on selected industry."""
     if st.session_state.selected_industry == "fnb":
         st.session_state.process_map_nodes = get_fnb_nodes()
-    else:
+    elif st.session_state.selected_industry == "legal":
         st.session_state.process_map_nodes = get_legal_nodes()
+    else:
+        st.session_state.process_map_nodes = get_finance_nodes()
 
 # Initialize nodes
 if "process_map_nodes" not in st.session_state:
@@ -133,8 +160,10 @@ def convert_to_react_flow_nodes_and_edges():
     """Generate React Flow nodes/edges from the logical structure based on selected industry."""
     if st.session_state.selected_industry == "fnb":
         return convert_fnb_nodes_and_edges()
-    else:
+    elif st.session_state.selected_industry == "legal":
         return convert_legal_nodes_and_edges()
+    else:
+        return convert_finance_nodes_and_edges()
 
 def convert_fnb_nodes_and_edges():
     """Generate React Flow nodes/edges for Restaurant Franchise."""
@@ -315,14 +344,116 @@ def convert_legal_nodes_and_edges():
 
     return nodes, edges
 
+def convert_finance_nodes_and_edges():
+    """Generate React Flow nodes/edges for Finance Firm."""
+    nodes = []
+    edges = []
+    
+    root_pos = {'x': 725, 'y': 50}
+    
+    nodes.append({
+        'id': 'finance_firm',
+        'type': 'editableNode',
+        'position': root_pos,
+        'data': {'label': '💰 Finance Firm'},
+        'style': { 'background': '#fff', 'border': '2px solid #065f46', 'width': 250, 'height': 60, 'fontWeight': 'bold', 'fontSize': '24px' }
+    })
+
+    # Departments with icons and their specific areas
+    departments = [
+        ('equity_research', '📊 Equity Research', [
+            ('tech_sector_analysis', 'Tech Sector'),
+            ('healthcare_sector_analysis', 'Healthcare Sector'),
+        ]),
+        ('fixed_income', '📈 Fixed Income', [
+            ('investment_grade', 'Investment Grade'),
+            ('high_yield', 'High Yield'),
+        ]),
+        ('portfolio_management', '💼 Portfolio Mgmt', [
+            ('growth_fund', 'Growth Fund'),
+            ('value_fund', 'Value Fund'),
+        ]),
+        ('risk_management', '🛡️ Risk Mgmt', [
+            ('market_risk', 'Market Risk'),
+            ('credit_risk', 'Credit Risk'),
+        ]),
+        ('trading', '📉 Trading', [
+            ('execution_analytics', 'Execution'),
+            ('market_making', 'Market Making'),
+        ]),
+    ]
+    
+    for idx, (dept_id, dept_label, areas) in enumerate(departments):
+        # Position departments horizontally
+        dept_pos = {'x': 100 + (idx * 320), 'y': 220}
+        
+        nodes.append({
+            'id': dept_id,
+            'type': 'editableNode',
+            'position': dept_pos,
+            'data': {'label': dept_label},
+            'style': { 'background': '#d1fae5', 'border': '1px solid #065f46', 'width': 180, 'height': 55, 'fontSize': '15px' }
+        })
+        
+        edges.append({
+            'id': f'e-root-{dept_id}',
+            'source': 'finance_firm',
+            'target': dept_id,
+            'type': 'smoothstep',
+            'sourceHandle': 'bottom-source',
+            'targetHandle': 'top-target',
+            'style': { 'strokeWidth': 2, 'stroke': '#065f46' }
+        })
+        
+        # Areas under each department - positioned horizontally
+        num_areas = len(areas)
+        area_width = 150
+        area_gap = 20
+        total_areas_width = (num_areas * area_width) + ((num_areas - 1) * area_gap)
+        dept_center_x = dept_pos['x'] + 90
+        start_x = dept_center_x - (total_areas_width / 2)
+        
+        for a_idx, (area_id, area_label) in enumerate(areas):
+            full_area_id = f'{dept_id}_{area_id}'
+            a_pos = {'x': start_x + (a_idx * (area_width + area_gap)), 'y': 380}
+            
+            nodes.append({
+                'id': full_area_id,
+                'type': 'editableNode',
+                'position': a_pos,
+                'data': {'label': f'📁 {area_label}'},
+                'style': { 
+                    'background': '#fff', 
+                    'border': '1px solid #6ee7b7', 
+                    'width': area_width, 
+                    'height': 55,
+                    'fontSize': '13px',
+                    'textAlign': 'center'
+                }
+            })
+            
+            edges.append({
+                'id': f'e-{dept_id}-to-{area_id}',
+                'source': dept_id,
+                'target': full_area_id,
+                'type': 'smoothstep',
+                'sourceHandle': 'bottom-source',
+                'targetHandle': 'top-target',
+                'style': { 'stroke': '#6ee7b7', 'strokeWidth': 2 }
+            })
+
+    return nodes, edges
+
 def map_node_to_files(node_id):
     """Map a node ID to files in sample_data based on current industry."""
     base = "sample_data"
     
     if st.session_state.selected_industry == "fnb":
         return map_fnb_node_to_files(node_id, base)
-    else:
+    elif st.session_state.selected_industry == "legal":
         return map_legal_node_to_files(node_id, base)
+    else:
+        return map_finance_node_to_files(node_id, base)
 
 def map_fnb_node_to_files(node_id, base):
     """Map F&B node ID to files."""
@@ -388,6 +519,42 @@ def map_legal_node_to_files(node_id, base):
     
     return []
 
+def map_finance_node_to_files(node_id, base):
+    """Map Finance Firm node ID to files."""
+    if node_id == 'finance_firm':
+        return []
+    
+    # Department IDs
+    departments = ['equity_research', 'fixed_income', 'portfolio_management', 'risk_management', 'trading']
+    
+    # Check if it's a department (no area suffix)
+    if node_id in departments:
+        return []
+    
+    # Map node IDs to folder names
+    area_folder_map = {
+        'equity_research_tech_sector_analysis': 'Equity_Research/Tech_Sector_Analysis',
+        'equity_research_healthcare_sector_analysis': 'Equity_Research/Healthcare_Sector_Analysis',
+        'fixed_income_investment_grade': 'Fixed_Income/Investment_Grade',
+        'fixed_income_high_yield': 'Fixed_Income/High_Yield',
+        'portfolio_management_growth_fund': 'Portfolio_Management/Growth_Fund',
+        'portfolio_management_value_fund': 'Portfolio_Management/Value_Fund',
+        'risk_management_market_risk': 'Risk_Management/Market_Risk',
+        'risk_management_credit_risk': 'Risk_Management/Credit_Risk',
+        'trading_execution_analytics': 'Trading/Execution_Analytics',
+        'trading_market_making': 'Trading/Market_Making',
+    }
+    
+    if node_id in area_folder_map:
+        path = os.path.join(base, "Finance_Firm", area_folder_map[node_id])
+        if os.path.exists(path):
+            try:
+                return [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+            except:
+                return []
+    
+    return []
+
 def get_expected_path_segment(node_id):
     """Get the expected path segment for a node ID based on current industry."""
     if st.session_state.selected_industry == "fnb":
@@ -398,7 +565,7 @@ def get_expected_path_segment(node_id):
             folder_name = parts[1].capitalize()
             return f"Restaurant_Franchise{os.sep}{group_name}{os.sep}{folder_name}"
         return None
-    else:
+    elif st.session_state.selected_industry == "legal":
         # Legal: Use the matter_folder_map
         matter_folder_map = {
             'corporate_law_techcorp_acquisition': 'Legal_Firm/Corporate_Law/TechCorp_Acquisition',
@@ -414,6 +581,23 @@ def get_expected_path_segment(node_id):
         }
         if node_id in matter_folder_map:
             return matter_folder_map[node_id].replace("/", os.sep)
+        return None
+    else:
+        # Finance: Use the area_folder_map
+        area_folder_map = {
+            'equity_research_tech_sector_analysis': 'Finance_Firm/Equity_Research/Tech_Sector_Analysis',
+            'equity_research_healthcare_sector_analysis': 'Finance_Firm/Equity_Research/Healthcare_Sector_Analysis',
+            'fixed_income_investment_grade': 'Finance_Firm/Fixed_Income/Investment_Grade',
+            'fixed_income_high_yield': 'Finance_Firm/Fixed_Income/High_Yield',
+            'portfolio_management_growth_fund': 'Finance_Firm/Portfolio_Management/Growth_Fund',
+            'portfolio_management_value_fund': 'Finance_Firm/Portfolio_Management/Value_Fund',
+            'risk_management_market_risk': 'Finance_Firm/Risk_Management/Market_Risk',
+            'risk_management_credit_risk': 'Finance_Firm/Risk_Management/Credit_Risk',
+            'trading_execution_analytics': 'Finance_Firm/Trading/Execution_Analytics',
+            'trading_market_making': 'Finance_Firm/Trading/Market_Making',
+        }
+        if node_id in area_folder_map:
+            return area_folder_map[node_id].replace("/", os.sep)
         return None
 
 # --- UI Layout ---
@@ -436,11 +620,19 @@ def select_legal():
         st.session_state.context_nodes = []
         st.session_state.highlight_nodes = []
 
+def select_finance():
+    if st.session_state.selected_industry != "finance":
+        st.session_state.selected_industry = "finance"
+        update_process_map_nodes()
+        # Clear context when switching industries
+        st.session_state.context_nodes = []
+        st.session_state.highlight_nodes = []
+
 col_board, col_chat = st.columns([3, 2])
 
 with col_board:
     # Industry selector buttons
-    ind_col1, ind_col2, ind_col3 = st.columns([1, 1, 3])
+    ind_col1, ind_col2, ind_col3, ind_col4 = st.columns([1, 1, 1, 2])
     with ind_col1:
         fnb_selected = st.session_state.selected_industry == "fnb"
         st.button(
@@ -457,6 +649,15 @@ with col_board:
             key="btn_legal",
             type="primary" if legal_selected else "secondary",
             on_click=select_legal,
+            use_container_width=True
+        )
+    with ind_col3:
+        finance_selected = st.session_state.selected_industry == "finance"
+        st.button(
+            "💰 Finance",
+            key="btn_finance",
+            type="primary" if finance_selected else "secondary",
+            on_click=select_finance,
             use_container_width=True
         )
     
@@ -676,7 +877,12 @@ with col_chat:
             
         else:
             # Search within the selected industry only
-            industry_filter = "Restaurant_Franchise" if st.session_state.selected_industry == "fnb" else "Legal_Firm"
+            industry_map = {
+                "fnb": "Restaurant_Franchise",
+                "legal": "Legal_Firm",
+                "finance": "Finance_Firm"
+            }
+            industry_filter = industry_map.get(st.session_state.selected_industry, "Restaurant_Franchise")
             relevant_docs = search_files(prompt, st.session_state.records, k=50, industry_filter=industry_filter)
 
         # Highlight logic

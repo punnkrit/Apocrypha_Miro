@@ -1,0 +1,29 @@
+LEVERAGED LOAN MARKET UPDATE
+
+Date: March 2025
+
+MARKET STATISTICS:
+- Index Price: 96.5
+- Yield to Maturity: 8.2%
+- Average Spread: SOFR + 350
+
+CLO MARKET:
+- New issuance: $25B (Q1 2025)
+- AAA spreads: SOFR + 140
+- Demand remains strong
+
+LOAN TECHNICALS:
+- Retail outflows slowing
+- CLO demand steady
+- New issue pipeline: $15B
+
+SECTOR PREFERENCES:
+✓ Software (defensive)
+✓ Healthcare services
+✗ Retail (avoid)
+✗ Media (streaming losses)
+
+COVENANT TRENDS:
+- Covenant-lite: 85% of market
+- EBITDA add-backs remain aggressive
+- Sponsor equity cures common

@@ -1,0 +1,33 @@
+MARKET STRUCTURE UPDATE
+
+March 2025
+
+EQUITY MARKET SHARE:
+- NYSE: 22%
+- NASDAQ: 18%
+- CBOE: 15%
+- Dark Pools: 35%
+- Other: 10%
+
+REGULATORY UPDATES:
+1. SEC Rule 605 changes (effective Q3)
+   - Enhanced execution quality disclosure
+   - Impact: More transparency
+
+2. Tick size pilot expansion
+   - Testing smaller increments
+   - Impact: Tighter spreads possible
+
+3. Payment for order flow review
+   - Ongoing SEC examination
+   - Impact: Business model risk
+
+TECHNOLOGY TRENDS:
+- Latency: Sub-microsecond now standard
+- AI/ML: Increasing in execution
+- Cloud: More adoption by exchanges
+
+ACTION ITEMS:
+- Review broker routing logic
+- Evaluate new dark pools
+- Prepare for Rule 605 compliance

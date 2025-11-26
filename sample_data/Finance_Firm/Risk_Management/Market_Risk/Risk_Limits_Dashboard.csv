@@ -1,0 +1,6 @@
+Desk,VaR_Limit_M,Current_VaR_M,Utilization,Status,Trend
+Equity Long/Short,8,5.2,65%,Green,Stable
+Fixed Income,7,4.8,69%,Green,Up
+Credit Trading,3,2.1,70%,Yellow,Up
+FX Trading,2,0.8,40%,Green,Down
+Commodities,1,0.6,60%,Green,Stable

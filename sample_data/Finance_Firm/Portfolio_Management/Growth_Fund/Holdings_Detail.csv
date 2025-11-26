@@ -1,0 +1,6 @@
+Ticker,Company,Shares,Avg_Cost,Current_Price,Weight,Gain_Loss
+NVDA,NVIDIA Corp,150000,450,890,8.5%,+98%
+MSFT,Microsoft,180000,280,410,7.2%,+46%
+AAPL,Apple Inc,320000,145,208,6.8%,+43%
+AMZN,Amazon,85000,120,185,5.5%,+54%
+GOOGL,Alphabet,280000,125,175,4.8%,+40%

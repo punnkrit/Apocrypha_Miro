@@ -1,0 +1,30 @@
+GREEKS LIMITS AND UTILIZATION
+
+Date: March 28, 2025
+
+DELTA LIMITS:
+- Limit: ±$10M
+- Current: +$2.5M
+- Utilization: 25%
+
+GAMMA LIMITS:
+- Limit: ±$2M per 1% move
+- Current: -$0.8M
+- Utilization: 40%
+
+VEGA LIMITS:
+- Limit: ±$3M per 1 vol point
+- Current: +$1.2M
+- Utilization: 40%
+
+THETA LIMITS:
+- Limit: -$500K per day
+- Current: -$150K
+- Utilization: 30%
+
+CONCENTRATION LIMITS:
+- Single name: 20% of book
+- Single expiry: 30% of book
+- Current max: SPY (18%)
+
+STATUS: All limits compliant

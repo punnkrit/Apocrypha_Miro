@@ -1,0 +1,28 @@
+HIGH YIELD DEFAULT MONITOR
+
+Date: March 2025
+
+TRAILING 12-MONTH DEFAULT RATE: 2.8%
+(vs. long-term average of 3.5%)
+
+RECENT DEFAULTS:
+1. Envision Healthcare - $7B debt
+   - Healthcare staffing
+   - Filed Chapter 11
+
+2. Rite Aid Corporation - $3.5B debt
+   - Retail pharmacy
+   - Opioid liabilities
+
+3. Party City - $1.2B debt
+   - Retail
+   - Liquidating
+
+EXPECTED DEFAULTS (NEXT 12 MONTHS):
+- Sector concentration: Retail, Healthcare
+- Estimated default rate: 3.5-4.0%
+
+RECOVERY RATES:
+- Senior Secured: 65%
+- Senior Unsecured: 40%
+- Subordinated: 20%

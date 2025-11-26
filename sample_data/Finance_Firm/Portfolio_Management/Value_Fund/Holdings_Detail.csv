@@ -1,0 +1,6 @@
+Ticker,Company,Shares,Avg_Cost,Current_Price,Weight,PE_Ratio
+BRK.B,Berkshire Hathaway,95000,320,425,6.5%,22
+JPM,JPMorgan Chase,120000,145,195,5.8%,11
+JNJ,Johnson & Johnson,150000,155,162,4.5%,15
+XOM,Exxon Mobil,180000,95,112,4.2%,12
+PG,Procter & Gamble,110000,145,165,3.8%,25

@@ -1,0 +1,32 @@
+COLLATERAL MANAGEMENT REPORT
+
+Date: March 28, 2025
+
+COLLATERAL RECEIVED:
+- Cash: $125M
+- Government Bonds: $85M
+- Corporate Bonds: $45M
+- Equities: $25M
+TOTAL: $280M
+
+COLLATERAL POSTED:
+- Cash: $95M
+- Government Bonds: $65M
+TOTAL: $160M
+
+NET COLLATERAL POSITION: +$120M
+
+MARGIN CALLS:
+- Received: 3 ($12M total)
+- Made: 2 ($8M total)
+
+HAIRCUTS APPLIED:
+- Cash: 0%
+- Govt Bonds: 2%
+- IG Corp: 5%
+- HY Corp: 15%
+- Equities: 20%
+
+CONCENTRATION LIMITS:
+- Single issuer: 10% (compliant)
+- Single country: 30% (compliant)

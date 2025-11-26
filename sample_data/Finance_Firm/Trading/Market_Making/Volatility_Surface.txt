@@ -1,0 +1,31 @@
+VOLATILITY SURFACE ANALYSIS
+
+Date: March 28, 2025
+Underlying: SPY (S&P 500 ETF)
+
+CURRENT LEVELS:
+- Spot: 520
+- ATM IV (30-day): 14.5%
+- VIX: 15.2
+
+TERM STRUCTURE:
+- 1 Week: 12.8%
+- 1 Month: 14.5%
+- 3 Month: 15.8%
+- 6 Month: 16.5%
+- 1 Year: 17.2%
+
+SKEW (25 Delta):
+- 1 Month: -3.2 vol points
+- 3 Month: -4.5 vol points
+
+OBSERVATIONS:
+1. Term structure in contango (normal)
+2. Skew slightly elevated
+3. Realized vol (20-day): 12.5%
+4. IV premium: +2.0 vol points
+
+TRADING IMPLICATIONS:
+- Sell vol on spikes above 18
+- Buy skew if it cheapens
+- Calendar spreads attractive

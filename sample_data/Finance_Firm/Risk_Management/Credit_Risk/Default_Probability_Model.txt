@@ -1,0 +1,37 @@
+DEFAULT PROBABILITY MODEL OUTPUT
+
+Model: Merton-KMV Distance to Default
+
+HIGH RISK CREDITS (PD > 5%):
+
+1. Spirit Airlines
+   - Distance to Default: 1.2
+   - 1-Year PD: 12.5%
+   - Exposure: $0 (avoided)
+
+2. AMC Entertainment
+   - Distance to Default: 1.8
+   - 1-Year PD: 8.2%
+   - Exposure: $0 (avoided)
+
+3. Rite Aid
+   - Distance to Default: 0.5
+   - 1-Year PD: 28%
+   - Exposure: $0 (avoided)
+
+ELEVATED RISK (PD 2-5%):
+
+1. Carnival Corp
+   - Distance to Default: 2.5
+   - 1-Year PD: 3.8%
+   - Exposure: $2.5M
+
+2. United Airlines
+   - Distance to Default: 2.8
+   - 1-Year PD: 2.9%
+   - Exposure: $1.8M
+
+MODEL VALIDATION:
+- Accuracy Ratio: 85%
+- Brier Score: 0.08
+- Last Updated: March 2025

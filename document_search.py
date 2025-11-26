@@ -138,10 +138,71 @@ def search_files(
         "workplace investigation": "workplace_investigation",
     }
     
+    # Finance firm keywords
+    finance_departments = {
+        "equity": "equity_research",
+        "research": "equity_research",
+        "stock": "equity_research",
+        "analyst": "equity_research",
+        "fixed income": "fixed_income",
+        "bond": "fixed_income",
+        "bonds": "fixed_income",
+        "credit": "fixed_income",
+        "yield": "fixed_income",
+        "portfolio": "portfolio_management",
+        "fund": "portfolio_management",
+        "asset": "portfolio_management",
+        "risk": "risk_management",
+        "var": "risk_management",
+        "stress test": "risk_management",
+        "trading": "trading",
+        "execution": "trading",
+        "market making": "trading",
+    }
+    
+    finance_areas = {
+        "tech sector": "tech_sector_analysis",
+        "technology": "tech_sector_analysis",
+        "apple": "tech_sector_analysis",
+        "microsoft": "tech_sector_analysis",
+        "nvidia": "tech_sector_analysis",
+        "healthcare": "healthcare_sector_analysis",
+        "pharma": "healthcare_sector_analysis",
+        "biotech": "healthcare_sector_analysis",
+        "glp": "healthcare_sector_analysis",
+        "investment grade": "investment_grade",
+        "ig": "investment_grade",
+        "corporate bond": "investment_grade",
+        "high yield": "high_yield",
+        "hy": "high_yield",
+        "junk": "high_yield",
+        "distressed": "high_yield",
+        "growth fund": "growth_fund",
+        "growth": "growth_fund",
+        "value fund": "value_fund",
+        "value": "value_fund",
+        "dividend": "value_fund",
+        "market risk": "market_risk",
+        "stress": "market_risk",
+        "factor": "market_risk",
+        "credit risk": "credit_risk",
+        "counterparty": "credit_risk",
+        "default": "credit_risk",
+        "execution": "execution_analytics",
+        "tca": "execution_analytics",
+        "broker": "execution_analytics",
+        "market making": "market_making",
+        "options": "market_making",
+        "volatility": "market_making",
+        "greeks": "market_making",
+    }
+    
     query_location = None
     query_category = None
     query_practice_area = None
     query_matter = None
+    query_finance_dept = None
+    query_finance_area = None
     
     # Check for F&B keywords
     for word in query_words:
@@ -163,6 +224,17 @@ def search_files(
     for key, val in legal_matters.items():
         if key in q:
             query_matter = val
+            break
+    
+    # Check for Finance keywords
+    for key, val in finance_departments.items():
+        if key in q:
+            query_finance_dept = val
+            break
+    
+    for key, val in finance_areas.items():
+        if key in q:
+            query_finance_area = val
             break
     
     # Filter records by context folders if provided
@@ -226,6 +298,14 @@ def search_files(
         
         # Legal matter matching
         if query_matter and query_matter.replace("_", "") in path.replace("_", ""):
+            path_score += 25.0
+        
+        # Finance department matching
+        if query_finance_dept and query_finance_dept.replace("_", "") in path.replace("_", ""):
+            path_score += 20.0
+        
+        # Finance area matching
+        if query_finance_area and query_finance_area.replace("_", "") in path.replace("_", ""):
             path_score += 25.0
         
         score += path_score
@@ -381,6 +461,55 @@ def extract_node_ids_from_paths(paths: List[str], industry: str = "fnb") -> List
             # Build full node ID for legal matters
             if practice_area and matter:
                 node_id = f"{practice_area}_{matter}"
+                if node_id not in node_ids:
+                    node_ids.append(node_id)
+                    
+        elif "finance_firm" in path_lower:
+            # Finance firm structure
+            department = None
+            area = None
+            
+            # Department mappings
+            department_map = {
+                "equity_research": "equity_research",
+                "fixed_income": "fixed_income",
+                "portfolio_management": "portfolio_management",
+                "risk_management": "risk_management",
+                "trading": "trading",
+            }
+            
+            # Area mappings
+            area_map = {
+                "tech_sector_analysis": "tech_sector_analysis",
+                "healthcare_sector_analysis": "healthcare_sector_analysis",
+                "investment_grade": "investment_grade",
+                "high_yield": "high_yield",
+                "growth_fund": "growth_fund",
+                "value_fund": "value_fund",
+                "market_risk": "market_risk",
+                "credit_risk": "credit_risk",
+                "execution_analytics": "execution_analytics",
+                "market_making": "market_making",
+            }
+            
+            for part in path_parts:
+                part_normalized = part.replace("-", "_")
+                
+                if not department:
+                    for key in department_map:
+                        if key == part_normalized:
+                            department = department_map[key]
+                            break
+                
+                if not area:
+                    for key in area_map:
+                        if key == part_normalized:
+                            area = area_map[key]
+                            break
+            
+            # Build full node ID for finance areas
+            if department and area:
+                node_id = f"{department}_{area}"
                 if node_id not in node_ids:
                     node_ids.append(node_id)
     

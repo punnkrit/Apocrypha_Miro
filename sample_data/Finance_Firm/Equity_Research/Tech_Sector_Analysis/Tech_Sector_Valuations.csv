@@ -1,0 +1,6 @@
+Ticker,Company,Price,Target,Rating,PE_FY25,Revenue_Growth
+AAPL,Apple Inc,208,245,Buy,27.7,8%
+MSFT,Microsoft,410,480,Buy,30.5,15%
+GOOGL,Alphabet,175,200,Buy,22.1,12%
+NVDA,NVIDIA,890,1000,Buy,45.2,55%
+META,Meta Platforms,520,580,Hold,24.8,18%

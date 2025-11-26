@@ -1,0 +1,30 @@
+INVESTMENT MEMORANDUM
+
+Subject: NVIDIA Corporation (NVDA)
+Date: March 25, 2025
+Author: Tech Research Team
+
+RECOMMENDATION: BUY
+Price Target: $1,000 (12-month)
+
+EXECUTIVE SUMMARY:
+NVIDIA remains the dominant player in AI/ML infrastructure.
+Data center revenue continues to exceed expectations.
+Blackwell architecture launch on track for H2 2025.
+
+THESIS:
+1. AI training demand insatiable through 2026
+2. Inference market expanding rapidly
+3. Software moat (CUDA) underappreciated
+4. Automotive/robotics optionality
+
+RISKS:
+- Customer concentration (hyperscalers)
+- Competition from AMD, custom chips
+- China export restrictions
+- Valuation premium
+
+VALUATION:
+- FY26 EPS estimate: $35
+- Target P/E: 28x (premium justified)
+- Price target: $1,000

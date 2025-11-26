@@ -1,0 +1,33 @@
+STRESS TEST RESULTS - Q1 2025
+
+SCENARIOS TESTED:
+
+1. 2008 Financial Crisis Replay
+   - Equity: -45%
+   - Credit spreads: +500 bps
+   - Portfolio Impact: -$85M (-8.5%)
+
+2. 2020 COVID Shock
+   - Equity: -35%
+   - Rates: -100 bps
+   - Portfolio Impact: -$62M (-6.2%)
+
+3. Inflation Spike (+300 bps)
+   - Equity: -20%
+   - Rates: +150 bps
+   - Portfolio Impact: -$45M (-4.5%)
+
+4. China Hard Landing
+   - EM Equity: -40%
+   - Commodities: -25%
+   - Portfolio Impact: -$38M (-3.8%)
+
+5. Geopolitical Crisis (Taiwan)
+   - Global Equity: -25%
+   - Tech: -40%
+   - Portfolio Impact: -$72M (-7.2%)
+
+CONCLUSIONS:
+- Portfolio resilient to most scenarios
+- Tech concentration is key risk
+- Recommend hedging tail risk
