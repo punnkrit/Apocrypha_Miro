@@ -47,6 +47,19 @@ if "context_nodes" not in st.session_state:
 if "highlight_nodes" not in st.session_state:
     st.session_state.highlight_nodes = []
 
+# Flag to ignore component re-adding nodes after we explicitly cleared
+if "ignore_context_updates" not in st.session_state:
+    st.session_state.ignore_context_updates = False
+
+# Track recently removed node IDs to prevent re-adding
+if "recently_removed_ids" not in st.session_state:
+    st.session_state.recently_removed_ids = set()
+
+# Track the last processed context update to avoid re-processing stale events
+if "last_processed_context_update" not in st.session_state:
+    st.session_state.last_processed_context_update = None
+
+
 # Scan local data once
 if "records" not in st.session_state:
     st.session_state.records = scan_dummy_data(root="sample_data")
@@ -210,14 +223,36 @@ with col_board:
         # Check for context update event
         if "_contextUpdate" in component_state:
             update = component_state["_contextUpdate"]
+            
+            # Create a unique signature for this update to detect duplicates
+            update_signature = None
             if update.get("type") == "add_to_context":
+                node_ids = tuple(sorted([n["id"] for n in update.get("nodes", [])]))
+                update_signature = f"add_{node_ids}"
+            
+            # Skip if this is the same update we already processed (stale component state)
+            if update_signature and update_signature == st.session_state.last_processed_context_update:
+                pass  # Already processed, skip
+            # Check if we should ignore this update (happens after explicit clear)
+            elif st.session_state.ignore_context_updates:
+                st.session_state.ignore_context_updates = False  # Reset flag
+                st.session_state.recently_removed_ids.clear()  # Also clear removed IDs
+                # Mark this update as processed so we don't see it again
+                st.session_state.last_processed_context_update = update_signature
+            elif update.get("type") == "add_to_context":
                 new_nodes = update.get("nodes", [])
                 added_count = 0
                 for n in new_nodes:
+                    node_id = n["id"]
+                    
+                    # Skip if this node was recently removed by user
+                    if node_id in st.session_state.recently_removed_ids:
+                        continue
+                    
                     # Avoid duplicates
-                    if not any(existing["id"] == n["id"] for existing in st.session_state.context_nodes):
+                    if not any(existing["id"] == node_id for existing in st.session_state.context_nodes):
                         # Resolve files
-                        files = map_node_to_files(n["id"])
+                        files = map_node_to_files(node_id)
                         node_with_files = {**n, "files": files}
                         st.session_state.context_nodes.append(node_with_files)
                         
@@ -228,42 +263,100 @@ with col_board:
                         })
                         added_count += 1
                 
+                # Mark this update as processed
+                st.session_state.last_processed_context_update = update_signature
+                
                 if added_count > 0:
+                    # Only clear recently_removed_ids when user intentionally adds NEW nodes
+                    # This means the user is actively adding, not the component re-sending old data
+                    st.session_state.recently_removed_ids.clear()
+                    
+                    # Ensure context nodes are highlighted immediately
+                    active_context_ids = [n['id'] for n in st.session_state.context_nodes]
+                    st.session_state.highlight_nodes = list(set(st.session_state.highlight_nodes + active_context_ids))
                     st.rerun()
 
 with col_chat:
     st.subheader("Chat")
     
-    # Context Display
-    if st.session_state.context_nodes:
-        with st.expander("📚 Active Context", expanded=True):
-            for node in st.session_state.context_nodes:
-                st.markdown(f"**{node['label']}**")
-                if node.get('files'):
-                    for f in node['files']:
-                        st.caption(f"• {f}")
-                else:
-                    st.caption("(No files found)")
-            
-            if st.button("Clear Context"):
-                st.session_state.context_nodes = []
-                st.rerun()
-
-    # Chat Interface
-    for msg in st.session_state.messages:
-        if msg["role"] == "system":
-            # Skipped rendering system messages
-            pass
+    # --- Callback functions for context management (defined outside container) ---
+    def remove_node_callback(node_id):
+        """Remove a specific node from context."""
+        # Add to recently removed set to prevent re-adding
+        st.session_state.recently_removed_ids.add(node_id)
+        
+        st.session_state.context_nodes = [n for n in st.session_state.context_nodes if n['id'] != node_id]
+        
+        if st.session_state.context_nodes:
+            st.session_state.highlight_nodes = [n['id'] for n in st.session_state.context_nodes]
         else:
-            with st.chat_message(msg["role"]):
-                if "relevant_docs" in msg:
-                    st.write("**References:**")
-                    # Scrollable container for references
-                    with st.container(height=150):
-                        for doc in msg["relevant_docs"]:
-                            st.caption(f"📄 {doc.get('name')} ({doc.get('path')})")
-                st.write(msg["content"])
+            st.session_state.highlight_nodes = []
+            # Set flag to prevent component from re-adding nodes
+            st.session_state.ignore_context_updates = True
+    
+    def clear_all_context_callback():
+        """Clear all context nodes."""
+        st.session_state.context_nodes = []
+        st.session_state.highlight_nodes = []
+        # Set flag to prevent component from re-adding nodes
+        st.session_state.ignore_context_updates = True
+    
+    # Create a scrollable container for the chat area (context + messages)
+    with st.container(height=650):
+        # Context Display
+        if st.session_state.context_nodes:
+            with st.expander("📚 Active Context", expanded=True):
+                # Render each node with its own container to avoid button interference
+                for idx, node in enumerate(st.session_state.context_nodes):
+                    # Use a container for each node to isolate button contexts
+                    node_container = st.container()
+                    with node_container:
+                        col1, col2 = st.columns([4, 1])
+                        with col1:
+                            st.markdown(f"**{node['label']}**")
+                            if node.get('files'):
+                                for f in node['files']:
+                                    st.caption(f"• {f}")
+                            else:
+                                st.caption("(No files found)")
+                        with col2:
+                            # Use on_click callback with unique key per node ID
+                            st.button(
+                                "❌",
+                                key=f"remove_node_{node['id']}",
+                                help=f"Remove {node['label']} from context",
+                                on_click=remove_node_callback,
+                                args=(node['id'],)
+                            )
+                    # Add a tiny divider between nodes (except after the last one)
+                    if idx < len(st.session_state.context_nodes) - 1:
+                        st.markdown("---")
+                
+                # Add spacing before the Clear All button
+                st.markdown("")  # Empty line for spacing
+                st.button(
+                    "🗑️ Clear All Context",
+                    key="clear_all_ctx_btn",
+                    on_click=clear_all_context_callback,
+                    use_container_width=True
+                )
 
+        # Chat Interface - Messages display
+        for msg in st.session_state.messages:
+            if msg["role"] == "system":
+                # Skipped rendering system messages
+                pass
+            else:
+                with st.chat_message(msg["role"]):
+                    if "relevant_docs" in msg:
+                        st.write("**References:**")
+                        # Scrollable container for references
+                        with st.container(height=150):
+                            for doc in msg["relevant_docs"]:
+                                st.caption(f"📄 {doc.get('name')} ({doc.get('path')})")
+                    st.write(msg["content"])
+
+    # Chat input stays outside the scrollable container (fixed at bottom)
     if prompt := st.chat_input("Ask about the files..."):
         # User message
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -272,17 +365,71 @@ with col_chat:
             
         # RAG / Search Logic
         relevant_docs = []
+        
+        # Strategy:
+        # 1. If user explicitly selected context nodes, use ONLY files from those nodes.
+        # 2. If NO context selected, fallback to keyword search across the entire board.
+        
         if st.session_state.context_nodes:
-            folder_names = [n['label'] for n in st.session_state.context_nodes]
-            relevant_docs = search_files(prompt, st.session_state.records, k=50, context_folders=folder_names)
+            # Direct lookup from context nodes (no search required)
+            all_context_files = []
+            for node in st.session_state.context_nodes:
+                node_id = node['id']
+                # Parse node_id to get the expected path components
+                # e.g., "west_expenses" -> West_Group/Expenses
+                parts = node_id.split('_')
+                if len(parts) >= 2:
+                    group_name = parts[0].capitalize() + "_Group"
+                    folder_name = parts[1].capitalize()
+                    expected_path_segment = f"{group_name}/{folder_name}".replace("/", os.sep)
+                else:
+                    expected_path_segment = None
+                
+                if 'files' in node:
+                    for f in node['files']:
+                        # Find the full record for this file that matches BOTH filename AND path
+                        for r in st.session_state.records:
+                            if r['name'] == f:
+                                # Verify this record belongs to the correct folder
+                                if expected_path_segment and expected_path_segment in r['path']:
+                                    all_context_files.append(r)
+                                    break
+                                elif not expected_path_segment:
+                                    # Fallback if we couldn't parse node_id
+                                    all_context_files.append(r)
+                                    break
+            
+            # Deduplicate based on path
+            seen_paths = set()
+            unique_docs = []
+            for d in all_context_files:
+                if d['path'] not in seen_paths:
+                    seen_paths.add(d['path'])
+                    # Assign a high artificial score since user explicitly selected it
+                    d_copy = d.copy()
+                    d_copy['score'] = 100.0 
+                    unique_docs.append(d_copy)
+            
+            relevant_docs = unique_docs
+            
         else:
-            # Search all
+            # Search all (Fallback)
             relevant_docs = search_files(prompt, st.session_state.records, k=50)
 
         # Highlight logic
         high_relevance_docs = []
-        if relevant_docs:
-            # Only highlight nodes for documents with score > 3.0
+        if st.session_state.context_nodes:
+            # If context is selected, ALL files in context are "high relevance" by definition
+            high_relevance_docs = relevant_docs
+            
+            # ONLY highlight the explicitly selected context nodes
+            # Do NOT derive from file paths - that can cause wrong groups to highlight
+            active_context_ids = [n['id'] for n in st.session_state.context_nodes]
+            st.session_state.highlight_nodes = active_context_ids
+            
+        elif relevant_docs:
+            # No context selected - use search results
+            # Only highlight nodes for documents with score > 25.0
             # This prevents low-relevance "noise" from lighting up the entire board
             high_relevance_docs = [d for d in relevant_docs if d.get('score', 0) > 25.0]
             new_highlights = extract_node_ids_from_paths([d['path'] for d in high_relevance_docs])
