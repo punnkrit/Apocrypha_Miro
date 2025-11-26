@@ -54,17 +54,30 @@ def search_files(
     records: List[Record],
     k: int = 50,
     context_folders: List[str] = None,
+    industry_filter: str = None,
 ) -> List[Record]:
-    """Improved keyword search with context filtering and better scoring."""
+    """Improved keyword search with context filtering and better scoring.
+    
+    Args:
+        query: Search query string
+        records: List of document records
+        k: Maximum number of results
+        context_folders: Optional list of folders to restrict search to
+        industry_filter: Optional industry folder to filter by (e.g., "Restaurant_Franchise" or "Legal_Firm")
+    """
     if not query:
         return []
     
     q = query.lower()
     query_words = set(q.split())
     
-    # Extract location and category from query
+    # First, filter by industry if specified
+    if industry_filter:
+        records = [r for r in records if industry_filter in r.get("path", "")]
+    
+    # Extract location and category from query (for F&B)
     locations = {"west": "west", "central": "central", "east": "east"}
-    categories = {
+    fnb_categories = {
         "accounting": "accounting",
         "expense": "expenses",
         "expenses": "expenses",
@@ -77,17 +90,80 @@ def search_files(
         "tax": "accounting",
     }
     
+    # Legal firm keywords
+    legal_practice_areas = {
+        "corporate": "corporate_law",
+        "m&a": "corporate_law",
+        "merger": "corporate_law",
+        "acquisition": "corporate_law",
+        "ipo": "corporate_law",
+        "litigation": "litigation",
+        "lawsuit": "litigation",
+        "dispute": "litigation",
+        "court": "litigation",
+        "real estate": "real_estate",
+        "property": "real_estate",
+        "lease": "real_estate",
+        "zoning": "real_estate",
+        "ip": "intellectual_property",
+        "intellectual property": "intellectual_property",
+        "patent": "intellectual_property",
+        "trademark": "intellectual_property",
+        "copyright": "intellectual_property",
+        "employment": "employment_law",
+        "compensation": "employment_law",
+        "workplace": "employment_law",
+        "hr": "employment_law",
+        "investigation": "employment_law",
+    }
+    
+    # Legal matter keywords
+    legal_matters = {
+        "techcorp": "techcorp_acquisition",
+        "globalretail": "globalretail_ipo",
+        "smith": "smith_v_megacorp",
+        "megacorp": "smith_v_megacorp",
+        "abc": "contractdispute",
+        "xyz": "contractdispute",
+        "contract dispute": "contractdispute",
+        "tower": "downtown_tower",
+        "downtown": "downtown_tower",
+        "office lease": "office_lease",
+        "biotech": "patent_portfolio_biotech",
+        "patent portfolio": "patent_portfolio",
+        "trademark dispute": "trademark_dispute",
+        "fashion": "trademark_dispute_fashion",
+        "executive": "executive_compensation",
+        "compensation review": "executive_compensation",
+        "workplace investigation": "workplace_investigation",
+    }
+    
     query_location = None
     query_category = None
+    query_practice_area = None
+    query_matter = None
+    
+    # Check for F&B keywords
     for word in query_words:
         for loc_key, loc_val in locations.items():
             if loc_key in word:
                 query_location = loc_val
                 break
-        for cat_key, cat_val in categories.items():
+        for cat_key, cat_val in fnb_categories.items():
             if cat_key in word:
                 query_category = cat_val
                 break
+    
+    # Check for Legal keywords (check full query for multi-word matches)
+    for key, val in legal_practice_areas.items():
+        if key in q:
+            query_practice_area = val
+            break
+    
+    for key, val in legal_matters.items():
+        if key in q:
+            query_matter = val
+            break
     
     # Filter records by context folders if provided
     filtered_records = records
@@ -97,11 +173,9 @@ def search_files(
             path = r.get("path", "").lower()
             for folder in context_folders:
                 folder_lower = folder.lower()
-                # Match folder name in path (e.g., "west_group" matches "west_group/accounting/...")
                 if folder_lower.replace("_", "") in path.replace("_", "").replace("/", ""):
                     filtered_records.append(r)
                     break
-        # If no matches in context, use all records
         if not filtered_records:
             filtered_records = records
     
@@ -122,13 +196,13 @@ def search_files(
         
         # Word matching
         for word in query_words:
-            if word in hay:
-                score += 2.0
-            if word in name:
-                score += 3.0
+            if len(word) > 2:  # Skip very short words
+                if word in hay:
+                    score += 2.0
+                if word in name:
+                    score += 3.0
         
-        # Path matching (boost if path matches query location/category)
-        # REQUIRE both location and category if both are present in query
+        # F&B path matching
         path_score = 0.0
         
         if query_location and query_location in path:
@@ -137,37 +211,39 @@ def search_files(
         if query_category and query_category in path:
             path_score += 10.0
             
-        # Bonus if BOTH matched and both were asked for
         if query_location and query_category:
             if (query_location in path) and (query_category in path):
-                path_score += 15.0  # Big boost for matching specific intersection
+                path_score += 15.0
             else:
-                # Penalize if we asked for a specific intersection but only found one part
-                # e.g. Asked for "Central Expenses", found "Central Permits" (only loc match)
                 path_score -= 5.0
         elif query_category and not query_location:
-            # If ONLY category was asked (e.g. "Expenses"), boost matches significantly
-            # to ensure they cross the high threshold (25.0)
             if query_category in path:
                 path_score += 15.0
+        
+        # Legal practice area matching
+        if query_practice_area and query_practice_area.replace("_", "") in path.replace("_", ""):
+            path_score += 20.0
+        
+        # Legal matter matching
+        if query_matter and query_matter.replace("_", "") in path.replace("_", ""):
+            path_score += 25.0
         
         score += path_score
         
         # Category name matching in filename
         if query_category:
-            for cat_key, cat_val in categories.items():
+            for cat_key, cat_val in fnb_categories.items():
                 if cat_key in name and cat_val == query_category:
                     score += 5.0
         
-        # Time period matching (Q1, Q2, Q3, Q4, March, 2024, etc.)
-        time_indicators = ["q1", "q2", "q3", "q4", "march", "april", "may", "2023", "2024"]
+        # Time period matching
+        time_indicators = ["q1", "q2", "q3", "q4", "march", "april", "may", "2023", "2024", "2025"]
         for indicator in time_indicators:
             if indicator in query_words and indicator in hay:
                 score += 3.0
         
         # Only add if score is positive
         if score > 0:
-            # Add score to the record for downstream filtering
             r_with_score = r.copy()
             r_with_score["score"] = score
             scored.append((score, r_with_score))
@@ -214,49 +290,99 @@ def render_results(results: List[Record]) -> None:
         st.caption(doc.get("path", ""))
 
 
-def extract_node_ids_from_paths(paths: List[str]) -> List[str]:
+def extract_node_ids_from_paths(paths: List[str], industry: str = "fnb") -> List[str]:
     """Extract board node IDs from document paths.
     
-    Maps paths like 'sample_data/East_Group/Accounting/file.pdf' to node IDs like 'east_A'.
+    For F&B: Maps paths like 'sample_data/Restaurant_Franchise/East_Group/Accounting/file.pdf' 
+             to node IDs like 'east_accounting'.
+    For Legal: Maps paths like 'sample_data/Legal_Firm/Intellectual_Property/Trademark_Dispute_Fashion/file.pdf'
+               to node IDs like 'intellectual_property_trademark_dispute_fashion'.
     """
     node_ids = []
+    
     for path in paths:
         path_lower = path.lower()
-        # Extract group and category from path segments
-        path_parts = path_lower.split("/")
+        path_parts = path_lower.replace("\\", "/").split("/")
         
-        group = None
-        category = None
-        
-        # Check each path segment for group and category
-        for part in path_parts:
-            part_clean = part.replace("_", "").replace("-", "")
+        if "restaurant_franchise" in path_lower:
+            # F&B structure
+            group = None
+            category = None
             
-            # Check for group
-            if not group:
-                if "westgroup" in part_clean or (part == "west" and group is None):
-                    group = "west"
-                elif "centralgroup" in part_clean or (part == "central" and group is None):
-                    group = "central"
-                elif "eastgroup" in part_clean or (part == "east" and group is None):
-                    group = "east"
+            for part in path_parts:
+                part_clean = part.replace("_", "").replace("-", "")
+                
+                if not group:
+                    if "westgroup" in part_clean:
+                        group = "west"
+                    elif "centralgroup" in part_clean:
+                        group = "central"
+                    elif "eastgroup" in part_clean:
+                        group = "east"
+                
+                if not category:
+                    if "accounting" in part_clean:
+                        category = "accounting"
+                    elif "expenses" in part_clean:
+                        category = "expenses"
+                    elif part_clean == "legal":
+                        category = "legal"
+                    elif "permits" in part_clean:
+                        category = "permits"
             
-            # Check for category
-            if not category:
-                if "accounting" in part_clean:
-                    category = "accounting"
-                elif "expenses" in part_clean or "expense" in part_clean:
-                    category = "expenses"
-                elif "legal" in part_clean:
-                    category = "legal"
-                elif "permits" in part_clean or "permit" in part_clean:
-                    category = "permits"
-        
-        # Build node ID (e.g., "central_legal" for Central_Group/Legal)
-        if group and category:
-            node_id = f"{group}_{category}"
-            if node_id not in node_ids:
-                node_ids.append(node_id)
+            if group and category:
+                node_id = f"{group}_{category}"
+                if node_id not in node_ids:
+                    node_ids.append(node_id)
+                    
+        elif "legal_firm" in path_lower:
+            # Legal firm structure
+            practice_area = None
+            matter = None
+            
+            # Practice area mappings
+            practice_area_map = {
+                "corporate_law": "corporate_law",
+                "litigation": "litigation",
+                "real_estate": "real_estate",
+                "intellectual_property": "intellectual_property",
+                "employment_law": "employment_law",
+            }
+            
+            # Matter mappings (folder name -> matter id part)
+            matter_map = {
+                "techcorp_acquisition": "techcorp_acquisition",
+                "globalretail_ipo": "globalretail_ipo",
+                "smith_v_megacorp": "smith_v_megacorp",
+                "contractdispute_abcvxyz": "contractdispute_abcvxyz",
+                "downtown_tower_development": "downtown_tower_development",
+                "office_lease_negotiation": "office_lease_negotiation",
+                "patent_portfolio_biotech": "patent_portfolio_biotech",
+                "trademark_dispute_fashion": "trademark_dispute_fashion",
+                "executive_compensation_review": "executive_compensation_review",
+                "workplace_investigation": "workplace_investigation",
+            }
+            
+            for part in path_parts:
+                part_normalized = part.replace("-", "_")
+                
+                if not practice_area:
+                    for key in practice_area_map:
+                        if key == part_normalized:
+                            practice_area = practice_area_map[key]
+                            break
+                
+                if not matter:
+                    for key in matter_map:
+                        if key == part_normalized:
+                            matter = matter_map[key]
+                            break
+            
+            # Build full node ID for legal matters
+            if practice_area and matter:
+                node_id = f"{practice_area}_{matter}"
+                if node_id not in node_ids:
+                    node_ids.append(node_id)
     
     return node_ids
 

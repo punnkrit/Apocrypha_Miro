@@ -227,13 +227,28 @@ def convert_legal_nodes_and_edges():
         'style': { 'background': '#fff', 'border': '2px solid #1a365d', 'width': 250, 'height': 60, 'fontWeight': 'bold', 'fontSize': '24px' }
     })
 
-    # Practice areas with icons
+    # Practice areas with icons and their specific matters
     practice_areas = [
-        ('corporate_law', '🏢 Corporate Law', ['TechCorp Acquisition', 'GlobalRetail IPO']),
-        ('litigation', '⚔️ Litigation', ['Smith v MegaCorp', 'Contract Dispute']),
-        ('real_estate', '🏗️ Real Estate', ['Tower Development', 'Office Lease']),
-        ('intellectual_property', '💡 IP', ['Patent Portfolio', 'Trademark Dispute']),
-        ('employment_law', '👥 Employment', ['Exec Compensation', 'Workplace Investigation']),
+        ('corporate_law', '🏢 Corporate Law', [
+            ('techcorp_acquisition', 'TechCorp Acquisition'),
+            ('globalretail_ipo', 'GlobalRetail IPO'),
+        ]),
+        ('litigation', '⚔️ Litigation', [
+            ('smith_v_megacorp', 'Smith v MegaCorp'),
+            ('contractdispute_abcvxyz', 'Contract Dispute'),
+        ]),
+        ('real_estate', '🏗️ Real Estate', [
+            ('downtown_tower_development', 'Tower Development'),
+            ('office_lease_negotiation', 'Office Lease'),
+        ]),
+        ('intellectual_property', '💡 IP', [
+            ('patent_portfolio_biotech', 'Patent Portfolio'),
+            ('trademark_dispute_fashion', 'Trademark Dispute'),
+        ]),
+        ('employment_law', '👥 Employment', [
+            ('executive_compensation_review', 'Exec Compensation'),
+            ('workplace_investigation', 'Workplace Investigation'),
+        ]),
     ]
     
     for idx, (area_id, area_label, matters) in enumerate(practice_areas):
@@ -259,17 +274,7 @@ def convert_legal_nodes_and_edges():
         })
         
         # Matters under each practice area
-        matter_ids = [
-            'techcorp_acquisition', 'globalretail_ipo',
-            'smith_v_megacorp', 'contractdispute_abcvxyz',
-            'downtown_tower_development', 'office_lease_negotiation',
-            'patent_portfolio_biotech', 'trademark_dispute_fashion',
-            'executive_compensation_review', 'workplace_investigation',
-        ]
-        
-        area_matters = matter_ids[idx*2:(idx*2)+2]
-        
-        for m_idx, (matter_id, matter_label) in enumerate(zip(area_matters, matters)):
+        for m_idx, (matter_id, matter_label) in enumerate(matters):
             full_matter_id = f'{area_id}_{matter_id}'
             # Stack matters vertically under each practice area
             m_pos = {'x': area_pos['x'] - 10, 'y': 350 + (m_idx * 90)}
@@ -289,8 +294,9 @@ def convert_legal_nodes_and_edges():
                 }
             })
             
+            # Each matter connects to its parent practice area
             edges.append({
-                'id': f'e-{area_id}-{matter_id}',
+                'id': f'e-{area_id}-to-{matter_id}',
                 'source': area_id,
                 'target': full_matter_id,
                 'type': 'smoothstep',
@@ -661,8 +667,9 @@ with col_chat:
             relevant_docs = unique_docs
             
         else:
-            # Search all (Fallback)
-            relevant_docs = search_files(prompt, st.session_state.records, k=50)
+            # Search within the selected industry only
+            industry_filter = "Restaurant_Franchise" if st.session_state.selected_industry == "fnb" else "Legal_Firm"
+            relevant_docs = search_files(prompt, st.session_state.records, k=50, industry_filter=industry_filter)
 
         # Highlight logic
         high_relevance_docs = []
@@ -680,7 +687,10 @@ with col_chat:
             # Only highlight nodes for documents with score > 25.0
             # This prevents low-relevance "noise" from lighting up the entire board
             high_relevance_docs = [d for d in relevant_docs if d.get('score', 0) > 25.0]
-            new_highlights = extract_node_ids_from_paths([d['path'] for d in high_relevance_docs])
+            new_highlights = extract_node_ids_from_paths(
+                [d['path'] for d in high_relevance_docs], 
+                industry=st.session_state.selected_industry
+            )
             st.session_state.highlight_nodes = new_highlights
         else:
             st.session_state.highlight_nodes = []
