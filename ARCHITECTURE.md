@@ -11,6 +11,9 @@
 - **Integration**: `_contextUpdate` events bridge the React frontend with the Python backend.
 - **Build Artifacts**: The frontend is built into `diagram-prototype/dist/`, which is served by the Streamlit component.
 
+**State Synchronization Challenge:**
+The React component maintains its own selection state, which can persist across Streamlit reruns. This creates a "two brains" problem where the frontend and backend can disagree. The backend uses deduplication flags (`last_processed_context_update`) and blocklists (`recently_removed_ids`) to prevent stale React events from re-adding cleared nodes.
+
 ### Backend
 `app.py` is the Streamlit entrypoint. It seeds the logical tree, converts it to React Flow nodes/edges, renders the custom component, and handles context/chat events.
 
@@ -20,11 +23,12 @@
 - Highlighted nodes from search results (`highlight_nodes`)
 - Cached file index (`records`)
 - Selected OpenAI model
+- Sync control flags (`ignore_context_updates`, `recently_removed_ids`, `last_processed_context_update`)
 
 **Core Logic:**
 - `convert_to_react_flow_nodes_and_edges()`: Transforms the logical tree into visual nodes with fixed layout coordinates.
 - `map_node_to_files()`: Derives filesystem paths from node IDs (e.g., `west_accounting` → `sample_data/West_Group/Accounting`).
-- Chat requests: Append to history -> Run `search_files` -> Highlight matching nodes -> Call OpenAI (optional).
+- Chat requests: If context nodes are selected, use files from those nodes directly; otherwise, run `search_files` -> Highlight matching nodes -> Call OpenAI.
 
 ### Data Layer
 `sample_data/` mirrors the board structure. Each `*_Group` directory contains department folders with canonical documents (PDFs, CSVs, XLSX, etc.).
@@ -47,7 +51,7 @@
 2. **Render**: `app.py` sends initial node/edge data to the React component.
 3. **Interact**: User interacts with the board (select, resize, edit).
 4. **Context**: User clicks **Add to Context** -> React emits `_contextUpdate` -> Streamlit updates session state.
-5. **Chat**: User asks a question -> Backend searches files restricted by context -> Updates chat & highlights board nodes.
+5. **Chat**: User asks a question -> If context nodes exist, use their files directly; otherwise search all files -> Updates chat & highlights board nodes.
 6. **Response**: AI generates answer based on retrieved excerpts.
 
 ## Extending the Project
