@@ -273,11 +273,19 @@ def convert_legal_nodes_and_edges():
             'style': { 'strokeWidth': 2, 'stroke': '#2c5282' }
         })
         
-        # Matters under each practice area
+        # Matters under each practice area - positioned horizontally like F&B folders
+        num_matters = len(matters)
+        matter_width = 150
+        matter_gap = 20
+        total_matters_width = (num_matters * matter_width) + ((num_matters - 1) * matter_gap)
+        # Center matters under the practice area (area width is 180)
+        area_center_x = area_pos['x'] + 90  # 180/2 = 90
+        start_x = area_center_x - (total_matters_width / 2)
+        
         for m_idx, (matter_id, matter_label) in enumerate(matters):
             full_matter_id = f'{area_id}_{matter_id}'
-            # Stack matters vertically under each practice area
-            m_pos = {'x': area_pos['x'] - 10, 'y': 350 + (m_idx * 90)}
+            # Position matters horizontally under each practice area
+            m_pos = {'x': start_x + (m_idx * (matter_width + matter_gap)), 'y': 380}
             
             nodes.append({
                 'id': full_matter_id,
@@ -287,9 +295,9 @@ def convert_legal_nodes_and_edges():
                 'style': { 
                     'background': '#fff', 
                     'border': '1px solid #a0aec0', 
-                    'width': 200, 
+                    'width': matter_width, 
                     'height': 55,
-                    'fontSize': '14px',
+                    'fontSize': '13px',
                     'textAlign': 'center'
                 }
             })
